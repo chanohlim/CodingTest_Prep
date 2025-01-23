@@ -43,10 +43,10 @@ while (1):
     if ni < 0 or ni >= m or nj < 0 or nj >= n: # 맵 범위 밖으로 간다면
         print('맵 범위 밖@')
         v = rotate_left(v) # 왼쪽으로 회전
-        if cnt < 2:
+        if cnt < 3:
             cnt += 1 # 회전 카운터 증가
         else:
-            if gamemap[ni - directions[v][0]][nj - directions[v][1]] == '0':
+            if gamemap[i - directions[v][0]][j - directions[v][1]] == '0':
                 print('육지로 복귀!')
                 i -= directions[v][0]
                 j -= directions[v][1]
@@ -60,10 +60,10 @@ while (1):
     elif gamemap[ni][nj] == '1': # 왼쪽으로 회전해서 전진한 곳이 바다일 때
         print('바다다!')
         v = rotate_left(v)
-        if cnt < 2:
+        if cnt < 3:
             cnt += 1 # 회전 카운터 증가
         else:
-            if gamemap[ni - directions[v][0]][nj - directions[v][1]] == '0':
+            if gamemap[i - directions[v][0]][j - directions[v][1]] == '0':
                 print('육지로 복귀!')
                 i -= directions[v][0]
                 j -= directions[v][1]
@@ -85,12 +85,19 @@ while (1):
     else:
         print('갔던 육지야!')
         v = rotate_left(v)
-        print(map_flag)
+        if cnt < 3:
+            cnt += 1 # 회전 카운터 증가
+        else:
+            if gamemap[i - directions[v][0]][j - directions[v][1]] == '0':
+                print('육지로 복귀!')
+                i -= directions[v][0]
+                j -= directions[v][1]
+                movecnt += 1
+                cnt = 0 # 카운터 리셋
+            else:
+                break
 
-    time.sleep(0.5)
     print()
-
-
 
 print(movecnt)
 
