@@ -1,11 +1,11 @@
-coin = [500,100,50,10,5,1]
+coins = [500,100,50,10]
 
-change = 1000 - int(input())
-n = 0
+n = int(input())
+change = 0
 
-for c in coin:
-    n += change // c
-    change %= c
 
-print(n)
+for coin in coins:
+    change += n // coin
+    n %= coin
 
+print(change)
