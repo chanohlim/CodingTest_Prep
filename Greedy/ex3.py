@@ -1,9 +1,13 @@
-n,m = map(int, input().split(' '))
-ans = 0
+'''
+Greedy.ex3의 Docstring
 
-for i in range(n):
-    ls = list(map(int, input().split(' ')))
-    a = min(ls)
-    ans = max(ans,a)
+입력:
+3 3
+3 1 2
+4 1 4
+2 2 2
 
-print(ans)
+출력:
+2
+'''
+
