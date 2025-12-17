@@ -1,4 +1,4 @@
-import time
+ import time
 
 n = int(input())
 cnt_h = 0
