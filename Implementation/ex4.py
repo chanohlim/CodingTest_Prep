@@ -1,5 +1,6 @@
 import time
 
+
 # 맵 생성
 n,m = map(int, input().split())
 i,j,v = map(int, input().split())
