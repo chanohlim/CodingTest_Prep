@@ -11,6 +11,7 @@ directions = [(-1,0),(0,1),(1,0),(0,-1)]
 gamemap = list()
 map_flag = [[0 for i in range(m)]for j in range(n)]
 
+
 for k in range(n):
     gamemap.append( tuple( input().split()) )
 
