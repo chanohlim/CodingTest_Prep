@@ -35,6 +35,26 @@ sea_cnt = 0
 
 while True:
 
+
+    if sea_cnt > 3: # 바라본 4면이 전부 이동 불가능
+
+        print("사방이 적이다!")
+
+        map_data[a][b] = 2 # 현재 있는 위치 방문표시
+
+        # 바라보는 방향 유지하면서 뒤로 한 칸 이동
+        da = a + directions[d-2][0]
+        db = b + directions[d-2][1]
+
+        if map_data[da][db] != 1: # 뒷 칸이 바다가 아니면
+            sea_cnt = 0
+            a, b = da, db
+            print(a,b,'칸으로 이동!')
+        else: # 뒷 칸이 바다면
+            print(da,db,"는 바다야! 으악!")
+            break
+
+
     if d == 0: # 시선 방향 변화 (반시계방향)
         d = 3
     else:
@@ -50,8 +70,11 @@ while True:
         sea_cnt += 1
         continue
 
-    if map_data[da][db] !=  0: # 바다면 스킵
+    if map_data[da][db] == 1: # 바다면 스킵
         print("바다다!")
+        sea_cnt += 1
+    if map_data[da][db] == 2: # 이미 방문한 육지면 스킵
+        print("이미 가본 육지다!")
         sea_cnt += 1
         continue
 
@@ -61,22 +84,18 @@ while True:
         map_data[a][b] = 2 # 현재 있는 칸은 방문 표시
         a, b = da, db # 바라보는 칸으로 이동
         print(a, b,'로 이동 완료!')
+        sea_cnt = 0
         cnt += 1 # 이동 횟수 + 1
 
     
-    if sea_cnt > 3:
-
-        map_data[a][b] = 2
-        da = a + directions[d-2][0]
-        db = b + directions[d-2][1]
-        if map_data[da][db] != 1:
-            a, b = da, db
-        else:
-            break
-
 print(cnt)
 
-print(map_data)
+print('현재 좌표:' ,a,b)
+
+for map in map_data:
+    for i in map:
+        print(i, end = ' ')
+    print()
 
 
 
