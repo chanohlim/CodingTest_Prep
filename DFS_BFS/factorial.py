@@ -16,4 +16,7 @@ def factorial_recur(n):
 
 
 print(factorial_iter(5))
+
+
+print(factorial_iter(5))
 print(factorial_recur(5))
