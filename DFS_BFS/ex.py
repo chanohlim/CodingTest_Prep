@@ -11,6 +11,7 @@
 한 번에 만들 수 있는 아이스크림의 개수를 출력한다.
 
 입력 예시:
+15 14
 00000111100000
 11111101111110
 11011101101110
@@ -38,3 +39,40 @@
 3) 1) ~ 2) 번의 과정을 모든 노드에 반복하며 방문하지 않은 지점의 수를 센다.
 
 '''
+
+def dfs(graph, x,y):
+    
+    # 좌표가 그래프 범위를 벗어나면 즉시 종료
+    if ( (x < 0) or (x > m-1) or (y < 0) or (y > n-1) ):
+        return False
+    
+    else:
+
+        if graph[x][y] == 0:
+            graph[x][y] = 1
+            dfs(graph,x-1,y)
+            dfs(graph,x+1,y)
+            dfs(graph,x,y-1)
+            dfs(graph,x,y+1)
+            return True
+        
+        else:
+            return False
+            
+    
+
+
+n, m = map(int, input().split())
+
+graph = list()
+result = 0
+
+for i in range(n):
+    graph.append(list(map(int, input())))
+
+for i in range(n):
+    for j in range(m):
+        if dfs(graph, i, j):
+            result += 1
+
+
