@@ -40,25 +40,25 @@
 
 '''
 
-def dfs(graph, x,y):
+def dfs(x,y):
     
     # 좌표가 그래프 범위를 벗어나면 즉시 종료
-    if ( (x < 0) or (x > m-1) or (y < 0) or (y > n-1) ):
+    if ( (x < 0) or (x > n-1) or (y < 0) or (y > m-1) ):
         return False
     
+    # 만약 해당 노드를 방문하지 않았다면
+    if graph[x][y] == 0:
+        print(x,y)
+        # 해당 노드 방문 처리
+        graph[x][y] = 1
+        dfs(x-1,y)
+        dfs(x+1,y)
+        dfs(x,y-1)
+        dfs(x,y+1)
+        return True
     else:
-
-        if graph[x][y] == 0:
-            graph[x][y] = 1
-            dfs(graph,x-1,y)
-            dfs(graph,x+1,y)
-            dfs(graph,x,y-1)
-            dfs(graph,x,y+1)
-            return True
+        return False
         
-        else:
-            return False
-            
     
 
 
@@ -72,7 +72,7 @@ for i in range(n):
 
 for i in range(n):
     for j in range(m):
-        if dfs(graph, i, j):
+        if dfs(i, j):
             result += 1
 
-
+print(result)
