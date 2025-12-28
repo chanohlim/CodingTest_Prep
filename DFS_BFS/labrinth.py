@@ -27,4 +27,45 @@ N x M 크기의 직사각형 미로에 갇혀있다.
 
 '''
 
-N,M 
+from collections import deque
+from time import sleep
+
+N,M = map(int, input().split())
+
+graph = list()
+
+for i in range(N):
+    graph.append(list(map(int, input())))
+
+i_mov = [0,0,1,-1]
+j_mov = [1,-1,0,0]
+
+def bfs(graph,i,j):
+
+    queue = deque()
+    queue.append((i,j))
+
+    while queue:
+        i,j = queue.popleft()
+        print(i,j)
+
+        for a in range(4):
+            di = i + i_mov[a]
+            dj = j + j_mov[a]
+
+            if di < 0 or di >= N or dj < 0 or dj >= M:
+                continue
+
+            if graph[di][dj] == 0:
+                continue
+            
+            graph[di][dj] = graph[i][j] + 1
+            queue.append((di,dj))
+        
+
+bfs(graph,0,0)
+
+for a in graph:
+    for b in a:
+        print (b, end = '')
+    print()
