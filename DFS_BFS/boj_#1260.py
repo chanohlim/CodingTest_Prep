@@ -29,11 +29,53 @@ DFS와 BFS
 1 2 3 4
 '''
 
+from collections import deque
+
 N, M, V = map(int, input().split())
 
-graph = list()
+graph = [[] for i in range (N+1)]
+visited = [False] * (N+1)
 
 for i in range(M):
-    graph.append(tuple(map(int, input().split())))
+    a,b = map(int,input().split())
+    graph[a].append(b)
+    graph[b].append(a)
 
-print(graph)
+def dfs(graph, v, visited):
+
+    if not visited[v]:
+        
+        visited[v] = True
+        print(v, end = ' ')
+        graph[v].sort()
+
+        for i in graph[v]:
+            dfs(graph,i,visited)
+
+
+def bfs(graph, v, visited):
+
+    queue = deque([v])
+
+    visited[v] = True
+
+    while queue:
+
+        v = queue.popleft()
+        print(v, end = ' ')
+        graph[v].sort()
+
+        for i in graph[v]:
+            if not visited[i]:
+                queue.append(i)
+                visited[i] = True
+
+
+
+dfs(graph, V, visited)
+print()
+
+visited = [False] * (N+1)
+
+bfs(graph, V, visited)
+print()
