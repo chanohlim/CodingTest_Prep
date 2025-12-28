@@ -28,7 +28,6 @@ N x M 크기의 직사각형 미로에 갇혀있다.
 '''
 
 from collections import deque
-from time import sleep
 
 N,M = map(int, input().split())
 
@@ -49,7 +48,7 @@ def bfs(graph,i,j):
         i,j = queue.popleft()
         print(i,j)
 
-        for a in range(4):
+        for a in range(4): # 상 하 좌 우 원소들 확인하기 => 한 좌표당 4번 연산
             di = i + i_mov[a]
             dj = j + j_mov[a]
 
@@ -58,14 +57,17 @@ def bfs(graph,i,j):
 
             if graph[di][dj] == 0:
                 continue
-            
-            graph[di][dj] = graph[i][j] + 1
-            queue.append((di,dj))
+            # 좌표를 처음 방문하는 경우에만 최단 거리 기록
+            if graph[di][dj] == 1:
+                graph[di][dj] = graph[i][j] + 1
+                queue.append((di,dj))
         
 
 bfs(graph,0,0)
 
 for a in graph:
     for b in a:
-        print (b, end = '')
+        print (b, end = ' ')
     print()
+
+print("최소 이동 수:",graph[N-1][M-1])
