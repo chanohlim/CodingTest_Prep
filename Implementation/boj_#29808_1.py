@@ -61,7 +61,7 @@ for a in range(201):
             result_list.add((b, a))
 
 
-result_list = sorted(result_list, key=lambda x: (x[0], x[1]))
+result_list = sorted(result_list, key=lambda x: (x[0], x[1])) # |국어-영어| 점수로 먼저 sort, 동일한 값일 경우 |수학-탐구| 점수로 sort
 
 print(len(result_list))
 for b, a in result_list:
