@@ -25,27 +25,26 @@ if student_id % 4763 != 0: # 학번이 4763으로 안나누어지면 바로 종�
 n = student_id // 4763 # 만약 학번이 4763으로 나눠지면 나누기
 
 
-for a in range(201): # a = |수학 - 탐구|
+for a in range(201): # a = |수학 - 탐구|, 이 차는 항상 0에서 200 사이이므로.
     i = 305 * a # 수학 < 탐구
     if i > n: # i가 n보다 커지면 성립이 안됨. i + 다른 정수 = n 이기 때문.
         break
 
     m = n - i # m = |국어 - 영어| * 212 or 305
 
-    if m % 108 == 0:
+    if m % 108 == 0: # 국어 < 영어
         b = m // 108
         if 0 <= b <= 200:
             result_list.add((b, a))
 
-    if m % 508 == 0:
+    if m % 508 == 0: # 국어 > 영어
         b = m // 508
         if 0 <= b <= 200:
             result_list.add((b, a))
 
 
-# i = 212 * a (탐구 > 수학)
 for a in range(201):
-    i = 212 * a
+    i = 212 * a # 수학 > 탐구
     if i > n:
         break
 
