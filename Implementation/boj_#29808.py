@@ -94,12 +94,6 @@ elif student_id % 4763 == 0:
                 if (0 <= ko_en <= 200) and (0 <= a <= 200):
                     result_list.append([ko_en, a])
 
-    result_list.sort(key=lambda x: (abs(400 * x[0]), abs(93 * x[1])))
-
-    # 정렬 기준:
-    # 1. 국어-영어 표준점수 차 (508 vs 108) → |400 * 국영|
-    # 2. 수학-탐구 표준점수 차 (305 vs 212) → |93 * 수탐|
-    result_list.sort(key=lambda x: (abs(400 * x[0]), abs(93 * x[1])))
 
     print(len(result_list))
 
