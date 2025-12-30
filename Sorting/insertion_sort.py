@@ -6,7 +6,15 @@
 
 '''
 
-arr = [5, 7, 4, 8, 9, 0, 2, 1, 6, 3]
+arr = [7, 5, 4, 8, 9, 0, 2, 1, 6, 3]
 
-for i in range(len(arr)):
-        
+for i in range(1, len(arr)):
+    print("i =",i)
+    idx = i
+    while (arr[idx] <= arr[idx-1]) and (idx > 0):
+        arr[idx], arr[idx-1] = arr[idx-1], arr[idx]
+        idx -= 1
+        print(arr)
+
+
+print(arr)
