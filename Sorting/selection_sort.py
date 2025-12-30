@@ -8,21 +8,42 @@
 arr = list(map(int, input().split()))
 
 
+def selection_desc(arr):
+    for i in range(len(arr)):
+        max_idx = i
 
-for i in range(len(arr)):
-    max_idx = i
-    max_val = arr[max_idx] 
+        for j in range(i+1,len(arr)):
+            print(i,j)
+            if arr[j] >= arr[max_idx]:
+                max_idx = j
+            
+        print("max: ",arr[max_idx], max_idx)
 
-    for j in range(i,len(arr)):
-        print(i,j)
-        if arr[j] >= max_val:
-            max_val = arr[j]
-            max_idx = j
+        arr[i], arr[max_idx] = arr[max_idx], arr[i]
         
-    print("max: ",max_val, max_idx)
-    arr[i], arr[max_idx] = arr[max_idx], arr[i]
-    print(arr)
+        print(arr)
+
+    return arr
+
+
+def selection_inc(arr):
+    for i in range(len(arr)):
+        min_idx = i
+
+        for j in range(i+1,len(arr)):
+            print(i,j)
+            if arr[j] <= arr[min_idx]:
+                min_idx = j
+            
+        print("max: ",arr[min_idx], min_idx)
+
+        arr[i], arr[min_idx] = arr[min_idx], arr[i]
+        
+        print(arr)
+
+    return arr
 
 
 
-print(arr)
+print("내림차순 선택 정렬:", selection_desc(arr))
+print("오름차순 선택 정렬:", selection_inc(arr))
