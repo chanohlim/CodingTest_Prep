@@ -13,3 +13,24 @@
 26
 
 '''
+
+N, K = map(int, input().split())
+
+arr_a = list(map(int, input().split()))
+arr_b = list(map(int, input().split()))
+
+for i in range(K):
+    
+    arr_a.sort()
+    arr_b.sort(reverse=True)
+
+    arr_a[0], arr_b[0] = arr_b[0], arr_a[0]
+
+
+sum = 0
+
+for i in arr_a:
+    sum += i
+
+print(sum)
+    
