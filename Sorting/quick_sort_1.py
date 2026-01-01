@@ -16,3 +16,7 @@ def quick_sort(array):
     return quick_sort(left_side) + [pivot] + quick_sort(right_side)
 
 print(quick_sort(array))
+
+# 파이썬의 특성을 활용한 퀵 정렬
+# 포인터를 활용한 정렬이 아닌, 함수형 정렬 (인덱스를 이동시키면서 하는 정렬 X)
+# 공간 복잡도 매우 커짐 => 비효율적
