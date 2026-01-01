@@ -11,12 +11,13 @@ array = [5, 7, 9, 0, 3, 1, 6, 2, 4, 8]
 
 def quick_sort(array, start, end):
 
+    # list 크기가 1이면
     if start >= end:
         return
 
-    pivot = start
-    left = start + 1
-    right = end
+    pivot = start # 피벗의 초깃값은 배열의 첫 원소
+    left = start + 1 # 왼쪽은 피벗값 + 1
+    right = end # 오른쪽은 배열의 끝값
 
     while left <= right: # 엇갈리는 즉시 반복문 탈출
 
@@ -32,7 +33,7 @@ def quick_sort(array, start, end):
 
         # 엇갈렸다면 작은 데이터와 피벗을 교체
         if left > right:
-            array[right], array[pivot] = array[pivot], array[right] 
+            array[right], array[pivot] = array[pivot], array[right]
 
         else: # 엇갈리지 않았다면 피벗보다 작은 데이터와 큰 데이터의 위치를 서로 교체
             array[left], array[right] = array[right], array[left]
