@@ -18,7 +18,7 @@ def quick_sort(array, start, end):
     left = start + 1
     right = end
 
-    while left <= right:
+    while left <= right: # 엇갈리는 즉시 반복문 탈출
 
         # 피벗보다 큰 데이터를 찾을 때까지 반복
         while left <= end and array[left] <= array[pivot]:
@@ -28,11 +28,16 @@ def quick_sort(array, start, end):
         while right > start and array[right] >= array[pivot]:
             right -= 1
 
+        # 이중 while 문을 사용해서 먼저 피벗보다 작은 데이터를 찾아놓고, 그 다음에 큰 데이터를 찾아놓는 방식
+
         # 엇갈렸다면 작은 데이터와 피벗을 교체
         if left > right:
             array[right], array[pivot] = array[pivot], array[right] 
-        else:
+
+        else: # 엇갈리지 않았다면 피벗보다 작은 데이터와 큰 데이터의 위치를 서로 교체
             array[left], array[right] = array[right], array[left]
+
+        # 엇갈리면 array[right]은 pivot 값을 가르키는 상태. 따라서 피봇 값 기준 왼쪽 리스트와 오른쪽 리스트로 분해하려면 right 값 기준으로 -1 +1
 
     quick_sort(array, start, right-1)
     quick_sort(array, right + 1, end)
