@@ -9,5 +9,13 @@ n = int(input())
 
 data = list()
 
+def setting(data):
+   return data[1]
+
 for i in range(n):
-    
+   input_ = input().split()
+   data.append((input_[0], int(input_[1])))
+
+result = sorted(data, key = setting)
+
+print(result)
