@@ -17,6 +17,7 @@ data = list()
 def setting(data):
    return data[1]
 
+
 def sort_fx(data, n):
    for i in range(n):
       input_ = input().split()
@@ -24,8 +25,18 @@ def sort_fx(data, n):
 
    return(sorted(data, key = setting))
 
-def count_sort(data):
-   
 
+def maximum(data, n):
+   
+   value = data[0][1]
+
+   for i in range(n):
+      if data[i][1] >= value:
+         value = data[i][1]
+      
+   return value
+         
+
+   
 result = sort_fx(data, n)
 print(result)
