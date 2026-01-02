@@ -37,18 +37,23 @@ def quick_sort(array, start, end):
 
 def binary_search(array, target, start, end):
 
+    print("start:",start,"end:",end)
+
+    if start > end: # 이진 탐색은 항상 start 와 end 사이에 타깃이 존재하는 불변의 법칙을 지킨다.
+        return None # 만약 start > end가 된다면 start 와 end 사이의 범위가 애초에 존재하지 않으니 이는 곧 '타깃이 배열에 없다'로 귀결
+
     middle = (start + end) // 2
 
-    print("middle:",middle)
+    print("middle:",middle,"value:",array[middle])
 
-    if target == array[middle]:
+    if target == array[middle]: # 타깃이 미들 값과 동일하면 미들 값 리턴
         return middle
     
     elif target < array[middle]:
-        return binary_search(array, target, start, middle)
+        return binary_search(array, target, start, middle - 1) # 미들 값보다 타깃이 작으면, 시작부터 미들값 전 값까지만 확인
     
     else:
-        return binary_search(array, target, middle, end)
+        return binary_search(array, target, middle + 1, end) # 미들 값보다 타깃이 크면, 미들 값 직후부터 끝 인덱스까지 확인
 
 
 
@@ -59,8 +64,9 @@ print(arr)
 
 target = int(input())
 
-try:
-    index = binary_search(arr, target, 0, len(arr) - 1)
-    print(target,"의 인덱스:",index)
-except RecursionError:
-    print(" 리스트에 찾으시는 값이 없습니다. ")
+index = binary_search(arr, target, 0, len(arr) - 1)
+
+if index:
+    print(index)
+else:
+    print("리스트 안에 찾으시는 값이 존재하지 않습니다.")
