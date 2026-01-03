@@ -5,7 +5,6 @@ binary search iteration
 '''
 
 arr = [4, 6, 22, 39, 25, 345, 2, 1, 24, 56]
-
 arr.sort()
 
 print(arr)
