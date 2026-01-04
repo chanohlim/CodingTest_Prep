@@ -22,22 +22,24 @@
 n = list(map(int, input()))
 
 count = [0 for i in range(10)]
-
+cnt = 0
+666
 for i in n:
+    
+    if i == 6:
+
+        if count[9] < count[i]:
+            count[9] += 1
+            continue
+
+    if i == 9:
+        
+        if count[6] < count[i]:
+            count[6] += 1
+            continue
+
     count[i] += 1
 
-cnt = 0
 
-count[9] = count[9] + count[6]
-count[6] = 0
 
-while sum(count):
-
-    for i in range(10):
-        
-        if count[i] > 0:
-            count[i] -= 1
-            
-    cnt += 1
-
-print(cnt)
+print(max(count))
