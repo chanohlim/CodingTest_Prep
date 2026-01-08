@@ -39,12 +39,15 @@
 N, M = map(int, input().split())
 ricecake = list(map(int, input().split()))
 
-def parametric_search(arr, target, start, end):
+def parametric_search(arr, target, start, end, best):
+
 
     if start > end:
-        return "원하는 길이를 만족하는 높이가 존재하지 않습니다."
+        return best
     
     mid = (start + end) // 2
+
+    print(start, end)
 
     total = 0
 
@@ -52,16 +55,16 @@ def parametric_search(arr, target, start, end):
         
         if mid < i:
             total += (i - mid)
+    
+    print(total, target, best)
         
-    if total == target:
-        return mid
+    if total >= target:
+        return parametric_search(arr, target, mid + 1, end, mid) # best = 현재의 mid값
     
-    elif total > target:
-        return parametric_search(arr, target, start, mid - 1)
+    elif total < target:
+        return parametric_search(arr, target, start, mid - 1, best) # best = 이전 재귀에서 받은 best값
     
-    elif total < target: 
-        return parametric_search(arr, target, mid + 1, end)
-    
-    
+
+print(parametric_search(ricecake, M, 0, max(ricecake), 0))
         
     
