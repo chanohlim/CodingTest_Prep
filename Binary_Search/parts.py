@@ -48,3 +48,22 @@ parts = list(map(int, input().split()))
 M = int(input())
 search = list(map(int, input().split()))
 
+def binary_search(arr, target, start, end):
+
+    if start > end:
+        return "no"
+
+    mid = (start + end) // 2 # while문 밖에 있어도 괜찮기는 함, 다만 start가 end보다 크면 이 연산을 수행할 필요가 없기 때문
+
+    if arr[mid] == target:
+        return "yes"
+            
+    if arr[mid] > target:
+        return binary_search(arr, target, start, mid - 1)
+    
+    elif arr[mid] < target:
+        return binary_search(arr, target, mid + 1, end)
+        
+    
+for i in search:
+    print(binary_search(parts, i, 0, len(parts) - 1), end = ' ')
