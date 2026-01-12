@@ -25,4 +25,25 @@
 
 -1
 
+
+
 '''
+
+N, M = map(int, input().split())
+coins = [int(input()) for i in range(N)]
+
+INF = 10001
+
+dp = [INF] * (M + 1)
+dp[0] = 0
+
+for coin in coins:
+    for i in range(coin, M + 1):
+        print(f'dp[{i}]: {i}원일 때 화폐 최소 개수 정하기: min(dp[{i} - {coin}] + 1: {dp[i - coin] + 1}, dp[{i}]: {dp[i]})', end = ' ')
+        dp[i] = min(dp[i - coin] + 1, dp[i])
+        print(f'최솟값: {dp[i]}')
+
+if dp[M] == INF:
+    print(-1)
+else:
+    print(dp[M])
