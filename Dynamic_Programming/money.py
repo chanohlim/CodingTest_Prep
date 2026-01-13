@@ -32,10 +32,12 @@
 N, M = map(int, input().split())
 coins = [int(input()) for i in range(N)]
 
-INF = 10001
+INF = 10001 # 특정 금액을 만들 수 있는 화폐 구성이 불가능함을 뜻함
 
-dp = [INF] * (M + 1)
-dp[0] = 0
+dp = [INF] * (M + 1) # 일단 구성하려는 금액보다 적은 모든 금액에 대해서 불가능함으로 초기화
+dp[0] = 0 # 0원을 만들 수 있는 경우는 화폐를 하나도 사용하지 않았을 때 가능하므로 0으로 설정
+
+# dp 배열의 값: 인덱스 - 특정 금액(0 ~ M원)     배열 원소 - 특정 금액을 만들 수 있는 최소한의 화폐 개수
 
 for coin in coins:
     for i in range(coin, M + 1):
