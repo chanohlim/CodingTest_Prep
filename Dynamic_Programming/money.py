@@ -26,6 +26,7 @@
 -1
 
 
+경로 복원
 
 '''
 
@@ -57,10 +58,31 @@ if dp[M] == INF:
     print(-1)
 else:
 
-    min = dp[M]
-    while min > 0:
+    i = M
+    d = dp[i]
+
+    while d > 0:
+
+
+        coin_result[choice[i]] += 1 # choice[i] = i원을 만들기 위해 마지막으로 사용한 화폐 단위
+        i -= choice[i] # i = i - choice[i]
+        d = dp[i]
         
-        for coin in coins:
-            min
 
     print(dp[M])
+
+    result = 0
+
+    for i in range(max(coins) + 1):
+        if coin_result[i]:
+            print(f'{i}원: {coin_result[i]}개,', end = ' ')
+            result += (i * coin_result[i])
+
+    print(result)
+
+    if result == M:
+        print(f"오류 검증 완료, {result} == {M}")
+    else:
+        print('오류')
+        
+    
