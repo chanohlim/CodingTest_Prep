@@ -57,6 +57,16 @@ fibonacci(3)은 fibonacci(2)와 fibonacci(1)의 결과를 얻고, 2를 리턴한
 
 T = int(input())
 
+cases = [int(input()) for i in range(T)]
+
 
 dp = [0] * 41
+dp[0] = (1,0)
+dp[1] = (0,1)
 
+for i in range(2, max(cases) + 1):
+    dp[i] = (dp[i-1][0] + dp[i-2][0], dp[i-1][1] + dp[i-2][1])
+
+
+for case in cases:
+    print(dp[case][0],dp[case][1])
