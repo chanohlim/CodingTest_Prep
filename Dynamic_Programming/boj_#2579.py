@@ -74,7 +74,7 @@ for i in range(2, N + 1):
             print('이전 계단 한 칸 올라옴')
 
             choice[i] = 2 # i번째 계단을 오려고 계단 두 개 올라옴
-            dp[i] = dp[i-2] + stairs[i-1]
+            dp[i] = dp[i-2] + stairs[i-1] 
 
     else:
 
