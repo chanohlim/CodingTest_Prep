@@ -43,45 +43,19 @@
 N = int(input())
 stairs = [int(input()) for i in range(N)]
 
-dp = [0] * 301
-choice = [0] * 301
+dp = [0] * N
 
-if stairs[1] > stairs[0]:
+dp[0] = stairs[0]
 
-    dp[2] = stairs[1]
-    choice[2] = 2
+if N >= 2:
+    dp[1] = stairs[0] + stairs[1]
 
-else:
-    
-    dp[1] = stairs[0]
-    choice[1] = 1
+if N >= 3:
+    dp[2] = max((stairs[0] + stairs[2]), (stairs[1] + stairs[2]))
 
-for i in range(2, N + 1):
+for i in range(3, N):
+    dp[i] = max((stairs[i] + dp[i-2]), (stairs[i] + stairs[i-1] + dp[i-3]))
+    print(f'{i+1}번째 계단일 때 최댓값 => (stairs[{i}]:{stairs[i]} + dp[{i-2}]:{dp[i-2]})와 (stairs[{i}]:{stairs[i]} + stairs[{i-1}]:{stairs[i-1]} + dp[{i-3}]:{dp[i-3]})')
+    print('최댓값:', dp[i])
 
-    if dp[i-1] > dp[i-2]: # i-1 까지의 합이 i-2 까지의 합보다 큼
-
-        print(f'dp[{i-1}]: {dp[i-1]} > dp[{i-2}]: {dp[i-2]}')
-
-        if choice[i-1] != 1: # 이전 계단을 두 칸 올라옴
-
-            print('이전 계단 두 칸 올라옴')
-
-            choice[i] = 1 # i번째 계단을 오려고 계단 한 개 올라옴
-            dp[i] = dp[i-1] + stairs[i-1]
-
-        else: # 이전 계단을 한 칸 올라옴
-
-            print('이전 계단 한 칸 올라옴')
-
-            choice[i] = 2 # i번째 계단을 오려고 계단 두 개 올라옴
-            dp[i] = dp[i-2] + stairs[i-1] 
-
-    else:
-
-        print(f'dp[{i-1}]: {dp[i-1]} < dp[{i-2}]: {dp[i-2]}')
-
-        choice[i] = 2 # i번째 계단을 오려고 계단 두 개 올라옴
-        dp[i] = dp[i-2] + stairs[i-1] 
-
-
-print(dp[N])
+print(dp[N - 1])
