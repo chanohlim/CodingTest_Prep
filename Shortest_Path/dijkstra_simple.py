@@ -64,6 +64,7 @@ visited = [False] * (n + 1)
 # 최단 거리 테이블을 모두 무한으로 초기화
 distance = [INF] * (n + 1)
 
+
 # 모든 간선 정보 입력받기
 for i in range(m):
     
@@ -72,14 +73,53 @@ for i in range(m):
     graph[a].append((b,c))
 
 
-def smallest_node(graph, n):
+def smallest_node():
 
-    smallest = graph[n][0]
-    for node in graph[n]:
-        if node[1] < smallest:
-            smallest = node[0]
+    index = 0
+    min_val = INF
+
+    for i in range(1, len(distance)):
+
+        if distance[i] < min_val and not visited[i]:
+            min_val = distance[i]
+            index = i
+        
+    return index
+
+
+def dijkstra(start):
+
+
+    distance[start] = 0
+    visited[start] = True
+
+    for node in graph[start]:
+        distance[node[0]] = min(distance[node[0]], node[1] + distance[start])
+
+    for i in range(n - 1):
+
+        a = smallest_node()
+        if a == 0:
+            break
+
+        print(f'{a}번 노드 탐색!')
+        visited[a] = True
+
+
+        for node in graph[a]: # a번 노드와 연결되어있는 다른 노드들에 대해서
+            distance[node[0]] = min(distance[node[0]], node[1] + distance[a])
+            # (현재 노드의 갱신되어있는 최단거리와, a번 노드까지의 거리 + a번 노드에서 현재 노드까지의 거리) 비교 후 최솟값 저장(갱신)
+
+        print(distance)
     
-    return smallest
 
-print(graph)
-print(smallest_node(graph, 1))
+dijkstra(start)
+
+
+for i in range(1,len(distance)):
+    
+    if distance[i] == INF:
+        print("INFINITY")
+
+    else:
+        print(distance[i])
