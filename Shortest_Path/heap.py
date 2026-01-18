@@ -80,6 +80,44 @@ class MinHeap:
             self.heap[idx], self.heap[smallest] = self.heap[smallest], self.heap[idx] # 부모 노드와 자식 노드 위치 스왑 => 부모 노드에 자식 노드가 들어가고, 자식 노드에 부모 노드가 들어감
             self._heapify_down(smallest) # 자식 노드의 인덱스를 매개로 전달하는 heapify_down 함수를 재귀 호출 => 인덱스가 heap 크기를 넘어설 때까지 or heap 조건에 위반되지 않을 때가지 반복
 
+    def print_tree(self):
+        n = len(self.heap)
+        if n == 0:
+            print("(empty)")
+            return
+
+        height = (n - 1).bit_length()
+        max_width = 2 ** height * 2
+
+        idx = 0
+        level = 0
+
+        while idx < n:
+            level_count = 2 ** level
+            nodes = self.heap[idx:idx + level_count]
+
+            # 🔽 (priority, node) → node만 추출
+            display_nodes = [str(node[1]) for node in nodes]
+
+            space_between = max_width // (level_count + 1)
+            line = " " * (space_between // 2)
+            line += (" " * space_between).join(display_nodes)
+            print(line)
+
+            # 가지 출력
+            if idx + level_count < n:
+                branch_line = ""
+                for _ in display_nodes:
+                    branch_line += " " * (space_between // 2 - 1)
+                    branch_line += "/"
+                    branch_line += " " * 3
+                    branch_line += "\\"
+                    branch_line += " " * (space_between // 2 - 1)
+                print(branch_line)
+
+            idx += level_count
+            level += 1
+
 
 h = MinHeap()
 h.push((3, 'A'))
@@ -89,4 +127,7 @@ h.push((0, 'D'))
 h.push((8, 'H'))
 h.push((6, 'K'))
 
-print(h.heap)
+h.print_tree()
+
+h.pop()
+h.print_tree()
