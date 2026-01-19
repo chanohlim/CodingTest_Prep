@@ -31,9 +31,9 @@ def dijkstra(start):
     heapq.heappush(pq, (0, start))
     distance[start] = 0
     
-    while pq:
+    while pq: # pq가 비어있지 않으면 계속 pop해서 거리 갱신
         
-        dist, now = heapq.heappop(pq) # 우선순위 제일 높은(거리 제일 가까운) 루트 노드 pop
+        dist, now = heapq.heappop(pq) # 우선순위 제일 높은(거리 제일 가까운) 루트 노드 pop (거리, 노드)
         
         if dist > distance[now]: # 이미 방문한 노드면 스킵 => 현재 노드까지의 최단거리보다 pop된 노드의 cost가 크면 이미 최솟값 확정된 방문 노드므로 스킵
             continue
@@ -44,21 +44,9 @@ def dijkstra(start):
 
             if cost < distance[node[0]]: # 새로운 최솟값 등장 => 갱신
                 distance[node[0]] = cost
-                heapq.heappush(pq, (cost, node[0]))
+                heapq.heappush(pq, (cost, node[0])) # 갱신된 distance 값 우선순위 큐에 push
 
 
 dijkstra(start)
 
 print(distance)
-
-        
-
-
-
-'''
-for i in graph[now]:
-    cost = dist + i[1]
-    if cost < distance[i[0]]:
-        distance[i[0]] = cost
-        heapq.heappush(q, (cost, i[0]))
-'''
