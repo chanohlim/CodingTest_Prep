@@ -19,7 +19,7 @@ distance = [INF] * (N + 1)
 # 모든 간선 정보 입력하기
 for i in range(M):
     
-    a, b, c = map(int, input().split())
+    a, b, c = map(int, input().split()) 
     # a노드에서 b노드까지의 거리: c
     graph[a].append((b, c))
 
