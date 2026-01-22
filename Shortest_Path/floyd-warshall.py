@@ -77,3 +77,4 @@ for i in range(N):
         else:
             print(table[i+1][j+1], end = ' ')
     print()
+    
