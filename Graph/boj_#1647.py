@@ -47,17 +47,35 @@
 출력 예시:
 8
 
+
+union 최적화를 안해주면 시간초과됨.
+union을 할 때 어떤 노드에 붙일지 결정을, 더 값이 작은 노드에 붙이는게 기존 코드
+만약 그렇게 하면, union의 파라미터 및 함수 호출 순서에 따라 하나의 트리가 깊이가 계속 깊어지는 상황 발생 가능
+
+따라서, 높이를 통제하는 rank(트리 높이 상한선)를 통해 트리 높이를 최대한 얕게 유지
+
+union by rank => if rank[a] > rank[b]: root[root[b]] = root[a]
+rank가 더 큰 노드에 새로운 트리를 붙인다.
+
+union by size => if size(a) > size(b): b를 a에 붙임
+팀의 팀원 수 같이 연산이 필요할땐 유리
+
 '''
 
+import sys
+input = sys.stdin.readline
 
 N, M = map(int, input().split())
 
 root = [i for i in range(N + 1)]
+rank = [i for i in range(N + 1)]
 
 def find_root(node):
 
-    if root[node] != node:
-        root[node] = find_root(root[node])
+    while root[node] != node: # 재귀 대신 반복문으로 시간복잡도 축소
+
+        root[node] = root[root[node]]
+        node = root[node] 
 
     return root[node]
 
@@ -65,11 +83,14 @@ def union(a, b):
 
     root_a = find_root(a)
     root_b = find_root(b)
-
-    if root_a < root_b:
-        root[root_b] = root_a
-    else:
+ 
+    if rank[root_a] > rank[root_b]: # 트리의 깊이가 a의 루트가 더 크면 전체적인 트리 높이를 최소로 유지하기 위해 b의 루트를 a의 루트로
+        root[root_b] = root_a # 자동으로 b의 rank도 결국 b의 루트가 a이므로 a의 rank와 같아짐
+    elif rank[root_b] > rank[root_a]:
         root[root_a] = root_b
+    else: # 두 노드의 rank가 같다면
+        root[root_b] = root_a # 임의로 트리 합치고
+        rank[root_a] += 1 # rank + 1 하기
 
 
 edges = list()
