@@ -21,6 +21,7 @@ N개의 강의에 대하여 수강하기까지 걸리는 최소 시간을 한 �
 4 3 1 -1
 3 3 -1
 
+=> 1 2 3 4 5
 '''
 
 from collections import deque
@@ -28,19 +29,22 @@ from collections import deque
 N = int(input())
 
 indegree = [0] * (N + 1)
-time = [0] * (N + 1)
-graph = [[] for i in range(N + 1)] # graph[i][0]: i번 강의의 수강 시간
+cost = [0] * (N + 1)
+graph = [[] for i in range(N + 1)]
 
 for i in range(1, N+1):
     
     input_list = list(map(int, input().split()))
     input_list.pop()
 
-    for j in input_list:
-        graph[i].append(j) # 1번 강의: 시간, 선수강의1, 선수강의2, ...
-        indegree[i] += 1
+    cost[i] = input_list[0]
     
-    indegree[i] -= 1
+
+    for j in range(1, len(input_list)):
+        graph[input_list[j]].append(i) # j번 강의: 선수과목 i
+        indegree[i] += 1
+
+print(indegree)
 
 
 def topology_sort():
@@ -62,21 +66,19 @@ def topology_sort():
         print(graph[now])
         print(q)
 
-        for i in range(1, len(graph[now])):
+        for i in range(len(graph[now])):
             node = graph[now][i]
             indegree[node] -= 1
             
             if indegree[node] == 0:
                 q.append(node)
+                cost[node] += cost[now]
 
     return result
 
 print(topology_sort())
-
-
-    
-    
-
+print(graph)
+print(cost)
 
 
 

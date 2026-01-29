@@ -70,3 +70,4 @@ else:
     for i in result:
         print(i, end = ' ')
 
+print(graph)
