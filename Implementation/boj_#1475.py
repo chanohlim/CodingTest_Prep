@@ -23,7 +23,7 @@ n = list(map(int, input()))
 
 count = [0 for i in range(10)]
 cnt = 0
-666
+
 for i in n:
     
     if i == 6:
