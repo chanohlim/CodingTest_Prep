@@ -14,7 +14,7 @@ def binary(array, target):
     start = 0
     end = len(array) - 1
     
-    while start <= end:
+    while start <= end: # 재귀로 하지 않고 while 반복문을 돌림으로써 시간복잡도를 줄임
 
         mid = (start + end) // 2
 
