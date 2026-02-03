@@ -29,3 +29,22 @@
 경로 복원
 
 '''
+
+N, M = map(int, input().split())
+
+INF = int(1e9)
+
+dp = [INF] * (M+1)
+dp[0] = 0
+
+coins = [int(input()) for i in range(N)]
+
+for coin in coins:
+
+    for i in range(coin, M + 1):
+        dp[i] = min(dp[i], dp[i-coin] + 1)
+
+if dp[M] != INF:
+    print(dp[M])
+else:
+    print(-1)
