@@ -21,3 +21,52 @@ X Y Z => 도시 X에서 도시 Y로의 통로를 통해 메시지가 전달되�
 
 '''
 
+import sys
+import heapq
+
+input = sys.stdin.readline
+
+INF = int(1e9)
+N, M, C = map(int, input().split())
+
+graph = [[] for i in range(N + 1)]
+distance = [INF] * (N + 1)
+
+for i in range(M):
+    X, Y, Z = map(int, input().split())
+    graph[X].append((Y, Z))
+
+
+def dijkstra(start):
+
+    pq = []
+    heapq.heappush(pq, (0, start))
+    distance[start] = 0
+
+    while pq:
+
+        dist, now = heapq.heappop(pq)
+
+        if dist > distance[now]:
+            continue
+
+        for node in graph[now]:
+            cost = dist + node[1]
+            
+            if cost < distance[node[0]]:
+                distance[node[0]] = cost
+                heapq.heappush(pq, (cost, node[0]))
+
+dijkstra(C)
+
+cnt = 0
+max_dist = 0
+for dist in distance:
+
+    if dist != INF and dist != 0:
+        cnt += 1
+        if dist > max_dist:
+            max_dist = dist
+
+
+print(cnt, max_dist)
