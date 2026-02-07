@@ -61,12 +61,6 @@ dijkstra(C)
 
 cnt = 0
 max_dist = 0
-for dist in distance:
+reachable = [i for i in distance if i != INF]
 
-    if dist != INF and dist != 0:
-        cnt += 1
-        if dist > max_dist:
-            max_dist = dist
-
-
-print(cnt, max_dist)
+print(len(reachable)-1, max(reachable))
