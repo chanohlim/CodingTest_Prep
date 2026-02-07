@@ -78,5 +78,3 @@ def topology():
 
 
 print(topology())
-
-print(graph)
