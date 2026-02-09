@@ -14,6 +14,30 @@
 N = int(input())
 
 coins = list(map(int, input().split()))
+coins.sort()
+
+
+target = 1
+flag = True
+
+for coin in coins:
+    
+    if coin > target:
+        print(target)
+        flag = False
+        break
+    target += coin 
+
+if flag:
+    print(target)
+
+'''
+
+bruteforce로 풀어봤는데 실패(시간초과)
+
+N = int(input())
+
+coins = list(map(int, input().split()))
 coins.sort(reverse = True)
 
 print(coins)
@@ -48,5 +72,5 @@ for i in range(1, sum(coins)+1):
         print(f"{result} - not able to make {i}")
         break
 
-    
 
+'''
