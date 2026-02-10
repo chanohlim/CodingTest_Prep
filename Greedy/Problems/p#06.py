@@ -1,31 +1,34 @@
+import heapq
+
 def solution(food_times, k):
     
     
     if k >= sum(food_times):
         return -1
-    
-    ans_list = list()
+
+    pq = list()
+
     for i in range(len(food_times)):
-        ans_list.append((food_times[i],i+1))
+        heapq.heappush(pq, (food_times[i], i+1))
 
-    ans_list.sort()
-    
-    answer = 0
+    previous = 0
+    length = len(food_times)
 
-    while k > 0:
+    while (pq[0][0] - previous) * length <= k:
 
-        if k - ans_list[answer][0] < 0:
-            break
-        elif k == ans_list[answer][0]:
-            answer += 1
-            break
+        now = heapq.heappop(pq)[0]
+        print(k)
+        k -= (now - previous) * length
+        print(k)
+        length -= 1
 
-        k -= ans_list[answer][0]
-        answer += 1
+        previous = now
+        
 
-    answer = ans_list[answer][1]
+    result = sorted(pq, key = lambda x: x[1])
 
-    return answer
+    return result[k%length][1]
+
 
 food_times = list(map(int, input().split()))
 k = int(input())
