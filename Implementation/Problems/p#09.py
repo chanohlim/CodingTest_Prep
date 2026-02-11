@@ -48,3 +48,84 @@ s	result
 
 
 '''
+
+s = input()
+
+def solution1(s):
+
+    length = len(s)
+
+    least = length
+
+    for compression in range(1, (length//2) + 1):
+
+        start = 0
+        temp = length
+
+        while start + compression < length:
+
+            reference = s[start:start+compression]
+            i = compression
+            cnt = 0
+
+            print(reference)
+
+            while reference == s[(start+i):(start+i)+compression]:
+                i += compression
+                cnt += 1
+
+            start += i
+
+            if cnt == 0:
+                continue
+
+            print(cnt)
+            
+            if 9 <= cnt < 99:
+                temp -= (( (cnt+1) * compression) - (compression + 2))
+                continue
+            elif 99 <= cnt < 999:
+                temp -= (( (cnt+1) * compression) - (compression + 3))
+                continue
+            elif cnt >= 999:
+                temp -= (( (cnt+1) * compression) - (compression + 4))
+                continue
+
+            temp -= (( (cnt+1) * compression) - (compression + 1))
+
+        print(temp, least)
+        
+        if temp < least:
+            least = temp
+        
+        if least == 3:
+            break
+
+    return least
+
+def solution2(s):
+
+    answer = len(s)
+
+    for step in range(1, len(s) // 2 + 1):
+        compressed = ""
+        prev = s[0:step]
+        count = 1
+
+        for j in range(step, len(s), step): # j가 step에서 시작해서, s의 길이가 될 때까지, step만큼 키우면서 반복
+            if prev == s[j:j + step]:
+                count += 1
+            else:
+                compressed += str(count) + prev if count >= 2 else prev
+                prev  = s[j:j + step]
+                count = 1
+
+        compressed += str(count) + prev if count >= 2 else prev
+
+        answer = min(answer, len(compressed))
+    
+    return answer
+
+            
+print(solution1(s))
+print(solution2(s))
