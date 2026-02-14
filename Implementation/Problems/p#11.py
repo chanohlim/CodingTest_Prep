@@ -197,4 +197,3 @@ while alive:
 
         t.sleep(1)
         os.system('clear')
-=
