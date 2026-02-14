@@ -75,4 +75,126 @@ X는 10,000 이하의 양의 정수이며, 방향 전환 정보는 X가 증가�
 예제 출력 3 
 13
 
+
+행 = i
+열 = j
+
+matrix[i][j]
+
 '''
+import os
+import time as t
+from collections import deque
+
+coor = []
+
+
+def print_arr(arr):
+
+    print()
+    
+    for i in arr:
+        for j in i:
+            print(j, end=' ')
+        print()
+
+    print()
+
+def move(board, d, head, time, length):
+    
+    i, j = head
+    
+
+    current_dir = direction_list[d]
+    next_i = i + current_dir[0]
+    next_j = j + current_dir[1]
+
+    if next_i < 0 or next_i >= N or next_j < 0 or next_j >= N: # 죽음 조건 1: 벽에 부딪히기
+        return False
+    
+    if board[next_i][next_j] == 1: # 자기 자신일때
+        return False
+
+    if board[next_i][next_j] == 2: # 사과가 있는 좌표에 도달했으면
+        length += 1
+        print("apple found!")
+        board[next_i][next_j] = 0
+    else:
+        prev_i, prev_j = coor[time - length]
+        board[prev_i][prev_j] -= 1
+
+    board[next_i][next_j] += 1
+        
+    return (next_i, next_j, length)
+
+N = int(input())
+
+board = [[0 for i in range(N)] for i in range(N)]
+apple = []
+
+K = int(input())
+
+for i in range(K):
+    
+    a, b = map(int, input().split())
+    board[a-1][b-1] = 2
+
+L = int(input())
+
+directions = deque()
+for i in range(L):
+    X, C = input().split() # L: 왼쪽, D: 오른쪽
+    directions.append((int(X), C))
+
+time = 0
+alive = True
+d = 1
+length = 1
+current = (0,0)
+direction_list = [(-1, 0), (0, 1), (1, 0), (0, -1)]
+
+board[0][0] = 1
+
+x, c = directions.popleft()
+coor.append((0,0))
+print_arr(board)
+t.sleep(1)
+os.system('clear')
+
+while alive:
+        
+        time += 1
+
+        current = move(board, d, coor[time - 1], time, length)
+
+        if current == False:
+            print("dead!")
+            print(time)
+            break
+
+        coor.append((current[0], current[1]))
+        length = current[2]
+        
+        print('time:', time)
+        print_arr(board)        
+
+        if time == x:
+            if c == 'L':
+                if d == 0:
+                    d = 3
+                else:
+                    d -= 1
+            else:
+                if d == 3:
+                    d = 0
+                else:
+                    d += 1
+            if not directions:
+                t.sleep(1)
+                os.system('clear')
+                continue
+            x, c = directions.popleft()
+
+        t.sleep(1)
+        os.system('clear')
+=
