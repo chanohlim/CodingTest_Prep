@@ -44,4 +44,5 @@ def solution2(n, l, r):
 
     return answer
 
+print(solution1(2, 4, 18))
 print(solution2(2, 4, 18))
