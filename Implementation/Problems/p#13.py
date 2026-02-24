@@ -112,7 +112,6 @@ def backtracking(start, path, end):
 
     if len(path) == end:
         combinations.append(list(path))
-        print(path)
         return
 
     for i in range(start, len(chicken)):
