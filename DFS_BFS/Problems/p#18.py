@@ -35,6 +35,7 @@ def seperate(p):
 
 def correct(p):
 
+
     if p[0] == ')':
         return False
     
