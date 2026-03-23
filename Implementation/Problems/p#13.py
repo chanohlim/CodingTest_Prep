@@ -77,7 +77,6 @@
 
 '''
 
-import itertools
 
 N, M = map(int, input().split())
 
