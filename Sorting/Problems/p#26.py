@@ -8,6 +8,7 @@
 100
 
 '''
+import heapq
 
 N = int(input())
 
@@ -16,14 +17,25 @@ arr = []
 for i in range(N):
     arr.append(int(input()))
 
-arr.sort()
 
-if N < 2:
-    result = 0
+if N == 1:
+    print(0)
+
 else:
-    result = arr[0] + arr[1]
 
-for i in range(2, N):
-    result += result + arr[i]
+    heapq.heapify(arr)
+    result = 0
 
-print(result)
+    while arr:
+
+        a = heapq.heappop(arr)
+        b = heapq.heappop(arr)
+
+        result += (a + b)
+
+        if not arr:
+            break
+
+        heapq.heappush(arr, a + b)
+    
+    print(result)
