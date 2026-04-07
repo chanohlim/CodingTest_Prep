@@ -11,6 +11,7 @@
 '''
 
 import heapq
+from collections import deque
 
 INF = int(1e9)
 
@@ -22,6 +23,39 @@ distance_table = [[INF] * (N + 1) for i in range(N + 1)]
 for i in range(M):
     a, b = map(int, input().split())
     graph[a].append(b)
+
+def bfs(start):
+
+    q = deque()
+    q.append(start)
+
+    distance_table[start][start] = 0
+
+    while q:
+        now = q.popleft()
+        
+        for node in graph[now]:
+            if distance_table[start][node] == INF:
+                distance_table[start][node] = distance_table[start][now] + 1
+                q.append(node)
+
+
+def floyd(N):
+
+    for i in range(1, N+1):
+        for j in graph[i]:
+            distance_table[i][j] = 1
+
+    for i in range(1, N+1):
+        distance_table[i][i] = 0
+
+    for k in range(1, N+1):
+        for i in range(1, N+1):
+            for j in range(1, N+1):
+                distance_table[i][j] = min(distance_table[i][j],
+                                           distance_table[i][k] + distance_table[k][j])
+
+
 
 def djikstra(start):
     
@@ -41,6 +75,17 @@ def djikstra(start):
 
 for i in range(1, N+1):
     djikstra(i)
+    bfs(i)
+
+floyd(N)
+
+for i in distance_table:
+    for j in i:
+        if j == INF:
+            print('X', end = ' ')
+        else:
+            print(j, end = ' ')
+    print()
 
 cnt = 0
 
@@ -57,6 +102,7 @@ for i in range(1, N+1):
 
     if all(flag[1:]) == True:
         cnt += 1
+        print(i)
 
 print(cnt)
 
