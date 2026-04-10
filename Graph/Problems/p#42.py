@@ -21,6 +21,9 @@
 
 '''
 
+from sys import stdin
+input = stdin.readline
+
 G = int(input())
 P = int(input())
 
@@ -57,8 +60,10 @@ def bruteforce():
 
 def find_root(node):
 
-    if root[node] != node:
-        root[node] = find_root(root[node])
+    while root[node] != node:
+
+        root[node] = root[root[node]]
+        node = root[node]
 
     return root[node]
 
