@@ -24,8 +24,8 @@
 G = int(input())
 P = int(input())
 
-root = [0]
-rank = [1 for i in range(G + 1)]
+root = [i for i in range(G + 1)]
+planes = []
 
 
 def bruteforce():
@@ -55,58 +55,43 @@ def bruteforce():
 
     return result
 
+def find_root(node):
+
+    if root[node] != node:
+        root[node] = find_root(root[node])
+
+    return root[node]
+
 def union(a, b):
 
-    root_a = root[a]
-    root_b = root[b]
+    root_a = find_root(a)
+    root_b = find_root(b)
 
-    print(a, root_a, b, root_b)
-
-    if root_a == root_b:
-        rank[root_a] += 1
-
-        if rank[root_a] > root_a:
-            return False
-        
-        return True
-
-    if root_a > root_b:
-
+    if root_a < root_b:
         root[root_b] = root_a
-        rank[root_a] += rank[root_b]
-
-        if rank[root_a] > root_a:
-            return False
-        
-        return True
-        
     else:
         root[root_a] = root_b
-        rank[root_b] += rank[root_a]
 
-        if rank[root_b] > root_b:
-            return False
-        
-        return True
-    
 
-    
 
 def main():
 
-    for i in range(P):
-        root.append(int(input()))
-
     result = 0
 
-    for i in range(1, P): # i의 root => root[i]
+    for i in range(P):
+        planes.append(int(input()))
 
-        if not union(i, i+1):
+    for plane in planes:
+        available = find_root(plane)
+        
+        if available == 0:
             break
+
+        union(available - 1, available)
 
         result += 1
 
-    return result + 1
+    return result
 
 print(main())
 
