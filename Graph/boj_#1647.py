@@ -75,7 +75,7 @@ def find_root(node):
     while root[node] != node: # 재귀 대신 반복문으로 시간복잡도 축소
 
         root[node] = root[root[node]]
-        node = root[node] 
+        node = root[node]
 
     return root[node]
 
