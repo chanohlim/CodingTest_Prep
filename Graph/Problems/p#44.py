@@ -51,15 +51,18 @@ def union(a, b):
 
 for i in range(N):
     X, Y, Z = map(int, input().split())
-    coor.append((X, Y, Z))
+    coor.append((X, Y, Z, i))
 
-def cost(a, b):
-    return min(abs(a[0] - b[0]), abs(a[1] - b[1]), abs(a[2] - b[2]))
+def cost(a, b, i):
+    return abs(a[i] - b[i])
 
 
-for i in range(N-1):
-    for j in range(i+1, N):
-        edges.append((cost(coor[i], coor[j]), i, j))
+
+for i in range(3):
+    coor.sort(key=lambda x: x[i])
+    
+    for j in range(N-1):
+        edges.append((cost(coor[j], coor[j+1], i), coor[j][3], coor[j+1][3]))
 
 edges.sort(key=lambda x: x[0])
 
