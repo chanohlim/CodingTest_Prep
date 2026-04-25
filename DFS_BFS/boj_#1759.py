@@ -65,7 +65,7 @@ path = []
 
 def backtracking(start, path, v_cnt):
 
-    if len(path) == L and v_cnt >= 1:
+    if len(path) == L and 1 <= v_cnt <= L - 2:
         print(''.join(path))
         return
 
