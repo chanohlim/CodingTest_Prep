@@ -39,31 +39,31 @@ r행 c열을 몇 번째로 방문했는지 출력한다.
 
 N, r, c = map(int, input().split())
 
-matrix = [[0] * (2**N) for i in range(2**N)]
-
 movement = [(0,0), (0, 1), (1, 0), (1,1)]
 
-def print_graph(arr):
-    for i in arr:
-        for j in i:
-            print(j, end = ' ')
-        print()
 
 def z(i, j, n):
-    
+    global r, c
+
     if n == 1:
         for k in range(4):
             di, dj = i + movement[k][0], j + movement[k][1]
-            matrix[di][dj] = matrix[i][j] + k
+            if r == di and c == dj:
+                print(k)
+                return k
+
+
 
     else:
         for k in range(4):
-            di, dj = i + movement[k][0]*(2** (n-1)), j + movement[k][1]*(2** (n-1))
-            matrix[di][dj] = matrix[i][j] + (2 ** (2 ** (n-1))) * k
-            z(di, dj, n-1)
+            start_i, start_j = i + movement[k][0]*(2** (n-1)), j + movement[k][1]*(2** (n-1))
+            end_i, end_j = start_i + (2** (n-1)) - 1, start_j + (2** (n-1)) - 1
+            print(start_i, start_j)
+            print(end_i, end_j)
+            if start_i <= r <= end_i and start_j <= c <= end_j:
+                print(k, k * (2**(2** (n-1))))
+                return z(start_i, start_j, n-1) + (k * (2**(2** (n-1))))
 
 
 
-z(0, 0, N)
-
-print_graph(matrix)
+print(z(0, 0, N))
