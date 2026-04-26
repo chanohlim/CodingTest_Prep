@@ -49,20 +49,18 @@ def z(i, j, n):
         for k in range(4):
             di, dj = i + movement[k][0], j + movement[k][1]
             if r == di and c == dj:
-                print(k)
                 return k
 
 
 
     else:
         for k in range(4):
+
             start_i, start_j = i + movement[k][0]*(2** (n-1)), j + movement[k][1]*(2** (n-1))
             end_i, end_j = start_i + (2** (n-1)) - 1, start_j + (2** (n-1)) - 1
-            print(start_i, start_j)
-            print(end_i, end_j)
+
             if start_i <= r <= end_i and start_j <= c <= end_j:
-                print(k, k * (2**(2** (n-1))))
-                return z(start_i, start_j, n-1) + (k * (2**(2** (n-1))))
+                return z(start_i, start_j, n-1) + (k * (2**((2*n)-2)))
 
 
 
