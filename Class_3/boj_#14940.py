@@ -1,13 +1,13 @@
 '''
 
 15 15
-2 1 1 1 1 1 1 1 1 1 1 1 1 1 1
 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
+1 1 1 1 1 1 1 2 1 1 1 1 1 1 1
 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1
@@ -15,7 +15,7 @@
 1 1 1 1 1 1 1 1 1 1 0 0 0 0 1
 1 1 1 1 1 1 1 1 1 1 0 1 1 1 1
 1 1 1 1 1 1 1 1 1 1 0 1 0 0 0
-1 1 1 1 1 1 1 1 1 1 0 1 1 1 1
+1 1 1 1 1 1 1 1 1 1 0 1 1 0 1
 
 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14
 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15
@@ -42,12 +42,14 @@ movement = [(-1, 0), (1, 0), (0, -1), (0, 1)]
 
 def bfs(i, j, N, M):
 
+    distance = [[-1] * M for k in range(N)]
+
     q = deque()
     q.append((i, j))
+    distance[i][j] = 0
 
     while q:
         i, j = q.popleft()
-        print(i, j)
 
         for k in range(4):
             di, dj = i + movement[k][0], j + movement[k][1]
@@ -55,17 +57,22 @@ def bfs(i, j, N, M):
             if di < 0 or di >= N or dj < 0 or dj >= M:
                 continue
 
-            if graph[di][dj] == 1:
-                graph[di][dj] = graph[i][j] + 1
+            if graph[di][dj] == 0:
+                continue
+
+            if graph[di][dj] == 1 and distance[di][dj] == -1: # 방문 가능하고 아직 방문하지 않았으면
+                distance[di][dj] = distance[i][j] + 1
                 q.append((di, dj))
 
+    for i in range(N):
+        for j in range(M):
+            if graph[i][j] == 0:
+                print(0, end = ' ')
+                continue
 
-
-def print_graph(graph):
-    for i in graph:
-        for j in i:
-            print(j, end = ' ')
+            print(distance[i][j], end = ' ')
         print()
+        
 
 
 
@@ -76,24 +83,15 @@ graph = []
 for i in range(N):
     graph.append(list(map(int, input().split())))
 
+
+found = False
+
 for i in range(N):
     for j in range(M):
         if graph[i][j] == 2:
-
-            start_point = []
-
-            graph[i][j] = 0
-
-            for k in range(4):
-                di, dj = i + movement[k][0], j + movement[k][1]
-
-                if di < 0 or di >= N or dj < 0 or dj >= M:
-                    continue
-
-                graph[di][dj] = 1
-                start_point.append((di, dj))
-
-            bfs(start_point, N, M)
+            bfs(i, j, N, M)
+            found = True
             break
-
-print_graph(graph)
+        
+    if found:
+        break
