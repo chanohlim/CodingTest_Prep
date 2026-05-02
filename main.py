@@ -1,28 +1,26 @@
 '''
 
 5
-2 3 1 2 2
+3 2 1 1 9
 
-2
+8
 
 '''
 from sys import stdin
 input = stdin.readline
 
-N = int(input())
+n = int(input())
+data = list(map(int, input().split()))
 
-explorers = list(map(int, input().split()))
+data.sort()
 
-explorers.sort()
+target = 1
 
-cnt = 0
+for coin in data:
 
+    if coin > target:
+        break
 
-for i in explorers:
-    cnt += 1
-    if cnt >= i:
-        result += 1
-        cnt = 0
+    target += coin
 
-print(cnt)
-
+print(target)
