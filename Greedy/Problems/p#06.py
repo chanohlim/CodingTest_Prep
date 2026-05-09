@@ -1,3 +1,10 @@
+'''
+
+bruteforce로는 안풀리니까, 레벨 단위로 음식을 처리하는 아이디어가 핵심
+그리디를 사용해 시간이 적은 음식부터 우선적으로 처리
+
+'''
+
 import heapq
 
 def solution(food_times, k):
@@ -15,7 +22,7 @@ def solution(food_times, k):
         
     while (pq[0][0]-previous) * length <= k:
         
-        now, index = heapq.heappop(pq)
+        now = heapq.heappop(pq)[0]
         
         k -= (now-previous) * length
         length -= 1
