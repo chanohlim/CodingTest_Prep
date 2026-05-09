@@ -1,39 +1,44 @@
 '''
 
-#05 볼링공 고르기
-
-입력:
 5 3
 1 3 2 3 2
 
 8 5
 1 5 4 3 2 4 5 2
 
-출력:
-8
-
-25
+'''
 
 
 N, M = map(int, input().split())
-
-count = [0] * (M + 1)
-
-input_list = list(map(int, input().split()))
-
-for i in input_list:
-    count[i] += 1
+K = list(map(int, input().split()))
 
 result = 0
 
-for i in count:
-    if i <= 1:
-        continue
-    result += i*(i-1)//2
+# bruteforce
 
-answer = (N * (N-1) // 2) - result
+for i in range(N):
+    current_ball = K[i]
 
-print(answer)
+    for j in range(i+1, N):
+        if K[j] != current_ball:
+            result += 1
 
-'''
+print(result)
 
+
+# greedy - 가벼운 공부터 고르고, 남은 공들의 개수만큼 곱한다.
+
+count = [0] * (N + 1)
+for ball in K:
+    count[ball] += 1
+
+
+left = N
+ans = 0
+
+for i in range(1, N+1):
+    
+    left -= count[i]
+    ans += count[i] * left
+
+print(ans)
