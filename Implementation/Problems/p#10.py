@@ -33,92 +33,78 @@ key = [[0, 0, 0], [1, 0, 0], [0, 1, 1]] # len(key) = 3
 lock = [[1, 1, 1], [1, 1, 0], [1, 0, 1]]
 
 
+'''
+key	lock	result
+[[0, 0, 0], [1, 0, 0], [0, 1, 1]]	[[1, 1, 1], [1, 1, 0], [1, 0, 1]]	true
+'''
+
+key = [[0, 0, 0], [1, 0, 0], [0, 1, 1]]
+lock = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
+
+def print_arr(arr):
+    for i in arr:
+        for j in i:
+            print(j, end = ' ')
+        print()
+
+        
+        
 def solution(key, lock):
-
     answer = False
-
+    
     M = len(key)
     N = len(lock)
+    
+    lock_extended = [[0] * (3 * N) for i in range(3*N)]
 
-    lock_arr = [[0 for i in range(N * 3)] for i in range(N * 3)]
-
+    # 확장된 행렬에 기존 lock 추가
     for i in range(N):
         for j in range(N):
-            lock_arr[N + i][N + j] = lock[i][j]
-
-
-    for i in range(4):
+            lock_extended[N+i][N+j] = lock[i][j]
         
-        for i in range(1, 2 * N):
-            for j in range(1, 2 * N):
-                
-                start = (i, j)
-                print(start)
-                
+    
+    for a in range(4):
+        
+        for i in range(0, 2*N):
+            for j in range(0, 2*N):
+
                 for k in range(M):
                     for l in range(M):
-                        lock_arr[i + k][j + l] += key[k][l]
+                        lock_extended[i+k][j+l] += key[k][l]
 
-                print_arr(lock_arr)
-
-                if check(lock_arr, N):
+                if check([lock_extended[i][N:2*N] for i in range(N, 2*N)]):
                     return True
+                
                 else:
                     for k in range(M):
                         for l in range(M):
-                            lock_arr[i + k][j + l] -= key[k][l]
-                    
-                                    
-                
+                            lock_extended[i+k][j+l] -= key[k][l]
 
-        key = rotate(key)
-        print_arr(key)
-
-            
-        
-    print_arr(lock_arr)
-
-
+        key = rotate(key, M)
+    
+    
+    
     return answer
 
 
-def rotate(origin):
+def rotate(arr, M): # rotate 90 degrees clockwise
+    
+    new_arr = [[0] * M for i in range(M)]
+    
+    for i in range(M):
+        for j in range(M):
+            new_arr[i][j] = arr[M - j - 1][i]
 
-    n = len(origin)
-
-    new = [[0] * n for i in range(n)]
-
-    for i in range(n):
-        for j in range(n):
-            new[j][i] = origin[i][j]
-
-    for i in range(n):
-        for j in range(n//2):
-            new[i][j], new[i][n-j-1] = new[i][n-j-1], new[i][j]
-
-    return new
-
-def print_arr(arr):
+    return new_arr
+            
+def check(arr):
     
     for i in arr:
         for j in i:
-            print(j, end=' ')
-        print()
-    print()
-
-def check(arr, N):
+            if j != 1:
+                return False
     
-    flag = True
-
-    for i in range(N):
-        for j in range(N):
-            if arr[N + i][N + j] != 1:
-                flag = False
-
-    return flag
-
-    
-
+    return True
 
 
 print(solution(key, lock))
