@@ -1,104 +1,86 @@
 '''
 
-예제 입력 1 
-5 3
-0 0 1 0 0
-0 0 2 0 1
-0 1 2 0 0
-0 0 1 0 0
-0 0 0 0 2
-예제 출력 1 
-5
-예제 입력 2 
-5 2
-0 2 0 1 0
-1 0 1 0 0
-0 0 0 0 0
-2 0 0 1 1
-2 2 0 1 2
-예제 출력 2 
-10
-예제 입력 3 
-5 1
-1 2 0 0 0
-1 2 0 0 0
-1 2 0 0 0
-1 2 0 0 0
-1 2 0 0 0
-예제 출력 3 
-11
-예제 입력 4 
-5 1
-1 2 0 2 1
-1 2 0 2 1
-1 2 0 2 1
-1 2 0 2 1
-1 2 0 2 1
-예제 출력 4 
-32
+입력 예시1:
+4 4 2 1
+1 2
+1 3
+2 3
+2 4
 
+출력 예시1:
+4
+
+입력 예시2:
+4 3 2 1
+1 2
+1 3
+1 4
+
+출력 예시:
+-1
+
+입력 예시:
+4 4 1 1
+1 2
+1 3
+2 3
+2 4
+
+출력 예시:
+2
+3
 '''
+
 from sys import stdin
 input = stdin.readline
 
-import itertools
+from collections import deque
 
-N, M = map(int, input().split())
+INF = int(1e9)
 
-city = []
+N, M, K, X = map(int, input().split())
 
-for i in range(N):
-    city.append(list(map(int, input().split())))
+graph = [[] for i in range(N+1)]
+distance = [INF] * (N + 1)
 
-chicken = []
-house = []
+for i in range(M):
+    a, b = map(int, input().split())
+    graph[a].append(b) # a -> b로 갈 수 있음
 
-for i in range(N):
-    for j in range(N):
-        if city[i][j] == 1:
-            house.append((i, j))
-        elif city[i][j] == 2:
-            chicken.append((i, j))
-
-
-def chicken_distance(house, chicken):
-
-    result = 0
+def bfs(start, K):
     
-    for home in house:
-        distance = int(1e9)
+    q = deque()
+    q.append(start)
 
-        for c in chicken:
-            distance = min(distance, abs(home[0] - c[0]) + abs(home[1] - c[1]) )
+    distance[start] = 0
 
-        result += distance
-
-    return result
-
-answer = int(1e9)
+    possible_city = []
 
 
-def backtracking(start, path, M):
+    while q:
+        now = q.popleft()
 
-    global answer
+        for node in graph[now]:
 
-    if len(path) == M:
-        answer = min(answer, chicken_distance(house, list(path)))
-        print(list(path))
-        return
+            if distance[node] == INF:
+                distance[node] = distance[now] + 1
+
+                if distance[node] == K:
+                    possible_city.append(node)
+
+                q.append(node)
 
 
-    for i in range(start, len(chicken)):
-        x, y = chicken[i]
-        path.append((x, y))
-        backtracking(i+1, path, M)
-        path.pop()
-        
+    if possible_city:
+        return possible_city
+    else:
+        return -1
 
-# backtracking(0, [], M)
+possible_city = bfs(X, K)
 
-for combination in itertools.combinations(chicken, M):
-
-    answer = min(answer, chicken_distance(house, combination))
-
-print(answer)
+if possible_city == -1:
+    print(-1)
+else:
+    possible_city.sort()
+    for city in possible_city:
+        print(city)

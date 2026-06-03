@@ -1,4 +1,3 @@
-
 '''
 
 입력 예시1:
@@ -32,43 +31,56 @@
 3
 '''
 
+from sys import stdin
+input = stdin.readline
+
 from collections import deque
-import sys
 
-input = sys.stdin.readline
-
-N, M, K, X = map(int, input().split())
 INF = int(1e9)
 
-graph = [[] for i in range(N + 1)]
-distance = [-1] * (N + 1)
+N, M, K, X = map(int, input().split())
+
+graph = [[] for i in range(N+1)]
+distance = [INF] * (N + 1)
 
 for i in range(M):
     a, b = map(int, input().split())
-    graph[a].append(b)
+    graph[a].append(b) # a -> b로 갈 수 있음
 
-def bfs(start):
-
+def bfs(start, K):
+    
     q = deque()
     q.append(start)
+
     distance[start] = 0
 
+    possible_city = []
+
+
     while q:
-        now = q.popleft()     
+        now = q.popleft()
 
         for node in graph[now]:
-            if distance[node] == -1: # 방문 여부 확인
-                q.append(node)
+
+            if distance[node] == INF:
                 distance[node] = distance[now] + 1
-                
 
-bfs(X)
-cnt = 0
+                if distance[node] == K:
+                    possible_city.append(node)
 
-for i in range (1, N + 1):
-    if distance[i] == K:
-        print(i)
-        cnt += 1
+                q.append(node)
 
-if not cnt:
+
+    if possible_city:
+        return possible_city
+    else:
+        return -1
+
+possible_city = bfs(X, K)
+
+if possible_city == -1:
     print(-1)
+else:
+    possible_city.sort()
+    for city in possible_city:
+        print(city)
