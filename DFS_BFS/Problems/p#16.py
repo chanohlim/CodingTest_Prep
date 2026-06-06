@@ -47,75 +47,102 @@
 0 1 0 0 0 0 0
 
 '''
-
-from sys import stdin
-from itertools import combinations
 from collections import deque
-import time
-
+from time import sleep
+from sys import stdin
 input = stdin.readline
+
+def print_graph(arr):
+    print()
+
+    for i in arr:
+        for j in i:
+            print(j, end = ' ')
+        print()
+
+    print()
+
+# bfs로 바이러스 퍼트리기
+def bfs(lab, viruses, N, M):
+    cnt = 0
+
+    q = deque(viruses)
+    movement = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+
+    while q:
+
+        i, j = q.popleft()
+
+        for k in range(4):
+            di, dj = i + movement[k][0], j + movement[k][1]
+
+            if di < 0 or di >= N or dj < 0 or dj >= M:
+                continue
+
+
+            if lab[di][dj] == 0:
+                lab[di][dj] = 2
+                q.append((di, dj))
+            else: # lab[di][dj] = 1 or 2 => 벽이거나 바이러스이므로 스킵
+                continue
+
+    
+    #print_graph(lab)
+    #sleep(1)
+
+    for i in range(N):
+        for j in range(M):
+            if lab[i][j] == 0:
+                cnt += 1
+            elif lab[i][j] == 2:
+                lab[i][j] = 0
+    
+    for virus in viruses:
+        i, j = virus
+        lab[i][j] = 2
+    
+    return cnt 
+    #return len(empty) - 3 - infected  => 원래 빈 공간에서 세운 벽 3개를 빼고, 새로 감염된 수(bfs 하면서 세기) 빼면 시간복잡도 최적화
 
 N, M = map(int, input().split())
 
-graph = []
-blank = []
+lab = []
+empties = []
 viruses = []
-
-for i in range(N):
-    graph.append(list(map(int, input().split())))
-
-for i in range(N):
-    for j in range(M):
-        if graph[i][j] == 0:
-            blank.append((i, j))
-        elif graph[i][j] == 2:
-            viruses.append((i, j))
-
-move = [(-1,0), (1,0), (0,1), (0,-1)]
-
-def dfs(i, j, graph):
-
-    for k in range(4):
-        di, dj = i + move[k][0], j + move[k][1]
-
-        if 0 <= di < N and 0 <= dj < M:
-            
-            if graph[di][dj] == 0:
-                graph[di][dj] = 2
-                dfs(di, dj, graph)
-
-def bfs(graph):
-
-    q = deque(viruses)
-    infected = 0
-
-    while q:
-        i, j = q.popleft()
-        for k in range(4):
-            di, dj = i + move[k][0], j + move[k][1]
-
-            if 0 <= di < N and 0 <= dj < M:
-
-                if graph[di][dj] == 0:
-                    graph[di][dj] = 2
-                    infected += 1
-                    q.append((di, dj))
-
-    return infected
-
-
 
 result = 0
 
-for wall in combinations(blank, 3): # 리스트에 저장하지 않고 바로 이터레이션
+for i in range(N):
+    lab.append(list(map(int, input().split())))
 
-    map_copy = [row[:] for row in graph] # deepcopy보다 가벼운 복사법
+# 빈칸, 바이러스 위치 구하기
+for i in range(N):
+    for j in range(M):
+        if lab[i][j] == 0:
+            empties.append((i, j))
+        elif lab[i][j] == 2:
+            viruses.append((i, j))
 
-    for coor in wall:
-        map_copy[coor[0]][coor[1]] = 1
 
-    cnt = len(blank) - 3 - bfs(map_copy)
+# 벽 세우기
+def backtracking(start, length, N, M):
+    global result
 
-    result = max(result, cnt)
+    if length == 3:
+        #print_graph(lab)
+        #sleep(1)
+        result = max(result, bfs(lab, viruses, N, M))
+        return
 
+    
+    for i in range(start, len(empties)):
+        x, y = empties[i]
+        lab[x][y] = 1 # 벽 세우기
+        backtracking(i + 1, length + 1, N, M)
+        lab[x][y] = 0 # 벽 지우기
+
+
+
+# 반복 후 안전 영역의 최댓값 출력
+backtracking(0, 0, N, M)
 print(result)

@@ -1,86 +1,142 @@
 '''
 
-입력 예시1:
-4 4 2 1
-1 2
-1 3
-2 3
-2 4
+7 7
+2 0 0 0 1 1 0
+0 0 1 0 1 2 0
+0 1 1 0 1 0 0
+0 1 0 0 0 0 0
+0 0 0 0 0 1 1
+0 1 0 0 0 0 0
+0 1 0 0 0 0 0
 
-출력 예시1:
-4
+27
 
-입력 예시2:
-4 3 2 1
-1 2
-1 3
-1 4
+4 6
+0 0 0 0 0 0
+1 0 0 0 0 2
+1 1 1 0 0 2
+0 0 0 0 0 2
 
-출력 예시:
--1
+9
 
-입력 예시:
-4 4 1 1
-1 2
-1 3
-2 3
-2 4
+8 8
+2 0 0 0 0 0 0 2
+2 0 0 0 0 0 0 2
+2 0 0 0 0 0 0 2
+2 0 0 0 0 0 0 2
+2 0 0 0 0 0 0 2
+0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0
 
-출력 예시:
-2
 3
-'''
 
+7 7
+2 1 0 0 1 1 0
+1 0 1 0 1 2 0
+0 1 1 0 1 0 0
+0 1 0 0 1 0 0
+0 0 0 0 0 1 1
+0 1 0 0 0 0 0
+0 1 0 0 0 0 0
+
+'''
+from collections import deque
+from time import sleep
 from sys import stdin
 input = stdin.readline
 
-from collections import deque
+def print_graph(arr):
+    print()
 
-INF = int(1e9)
+    for i in arr:
+        for j in i:
+            print(j, end = ' ')
+        print()
 
-N, M, K, X = map(int, input().split())
+    print()
 
-graph = [[] for i in range(N+1)]
-distance = [INF] * (N + 1)
+# bfs로 바이러스 퍼트리기
+def bfs(lab, viruses, N, M):
+    cnt = 0
 
-for i in range(M):
-    a, b = map(int, input().split())
-    graph[a].append(b) # a -> b로 갈 수 있음
-
-def bfs(start, K):
-    
-    q = deque()
-    q.append(start)
-
-    distance[start] = 0
-
-    possible_city = []
-
+    q = deque(viruses)
+    movement = [(-1, 0), (1, 0), (0, -1), (0, 1)]
 
     while q:
-        now = q.popleft()
 
-        for node in graph[now]:
+        i, j = q.popleft()
 
-            if distance[node] == INF:
-                distance[node] = distance[now] + 1
+        for k in range(4):
+            di, dj = i + movement[k][0], j + movement[k][1]
 
-                if distance[node] == K:
-                    possible_city.append(node)
-
-                q.append(node)
+            if di < 0 or di >= N or dj < 0 or dj >= M:
+                continue
 
 
-    if possible_city:
-        return possible_city
-    else:
-        return -1
+            if lab[di][dj] == 0:
+                lab[di][dj] = 2
+                q.append((di, dj))
+                cnt += 1
+            else: # lab[di][dj] = 1 or 2 => 벽이거나 바이러스이므로 스킵
+                continue
 
-possible_city = bfs(X, K)
+    
+    print_graph(lab)
+    sleep(1)
 
-if possible_city == -1:
-    print(-1)
-else:
-    possible_city.sort()
-    for city in possible_city:
-        print(city)
+    for i in range(N):
+        for j in range(M):
+            if lab[i][j] == 0:
+                cnt += 1
+            elif lab[i][j] == 2:
+                lab[i][j] = 0
+    
+    for virus in viruses:
+        i, j = virus
+        lab[i][j] = 2
+    
+    return cnt # return len(empty) - 3 - infected  => 원래 빈 공간에서 세운 벽 3개를 빼고, 새로 감염된 수(bfs 하면서 세기) 빼면 시간복잡도 최적화
+
+N, M = map(int, input().split())
+
+lab = []
+empties = []
+viruses = []
+
+result = 0
+
+for i in range(N):
+    lab.append(list(map(int, input().split())))
+
+# 빈칸, 바이러스 위치 구하기
+for i in range(N):
+    for j in range(M):
+        if lab[i][j] == 0:
+            empties.append((i, j))
+        elif lab[i][j] == 2:
+            viruses.append((i, j))
+
+
+# 벽 세우기
+def backtracking(start, length, N, M):
+    global result
+
+    if length == 3:
+        print_graph(lab)
+        sleep(1)
+        result = max(result, bfs(lab, viruses, N, M))
+        return
+
+    
+    for i in range(start, len(empties)):
+        x, y = empties[i]
+        lab[x][y] = 1 # 벽 세우기
+        backtracking(i + 1, length + 1, N, M)
+        lab[x][y] = 0 # 벽 지우기
+
+
+
+# 반복 후 안전 영역의 최댓값 출력
+backtracking(0, 0, N, M)
+print(result)
