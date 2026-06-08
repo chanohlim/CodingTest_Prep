@@ -1,50 +1,45 @@
 '''
 
-7 7
-2 0 0 0 1 1 0
-0 0 1 0 1 2 0
-0 1 1 0 1 0 0
-0 1 0 0 0 0 0
-0 0 0 0 0 1 1
-0 1 0 0 0 0 0
-0 1 0 0 0 0 0
-
-27
-
-4 6
-0 0 0 0 0 0
-1 0 0 0 0 2
-1 1 1 0 0 2
-0 0 0 0 0 2
-
-9
-
-8 8
-2 0 0 0 0 0 0 2
-2 0 0 0 0 0 0 2
-2 0 0 0 0 0 0 2
-2 0 0 0 0 0 0 2
-2 0 0 0 0 0 0 2
-0 0 0 0 0 0 0 0
-0 0 0 0 0 0 0 0
-0 0 0 0 0 0 0 0
+3 3
+1 0 2
+0 0 0
+3 0 0
+2 3 2
 
 3
 
-7 7
-2 1 0 0 1 1 0
-1 0 1 0 1 2 0
-0 1 1 0 1 0 0
-0 1 0 0 1 0 0
-0 0 0 0 0 1 1
-0 1 0 0 0 0 0
-0 1 0 0 0 0 0
+3 3
+1 0 2
+0 0 0
+3 0 0
+0 2 2
+
+0
 
 '''
-from collections import deque
-from time import sleep
+
+
 from sys import stdin
 input = stdin.readline
+
+import heapq
+from collections import deque
+
+N, K = map(int, input().split())
+
+arr = []
+
+for i in range(N):
+    arr.append(list(map(int, input().split())))
+
+S, X, Y = map(int, input().split()) # S초 뒤에 arr[X][Y]에 있는 바이러스의 종류는?
+
+pq = []
+
+for i in range(N):
+    for j in range(N):
+        if arr[i][j] != 0:
+            pq.append((arr[i][j], (i, j)))
 
 def print_graph(arr):
     print()
@@ -54,89 +49,67 @@ def print_graph(arr):
             print(j, end = ' ')
         print()
 
-    print()
+def infect_pq(pq, K, S):
 
-# bfs로 바이러스 퍼트리기
-def bfs(lab, viruses, N, M):
-    cnt = 0
-
-    q = deque(viruses)
+    heapq.heapify(pq)
     movement = [(-1, 0), (1, 0), (0, -1), (0, 1)]
 
-    while q:
+    while pq:
 
-        i, j = q.popleft()
+
+        n, now = heapq.heappop(pq)
+
+        if ( (n-1) // K ) == S: # 종료조건
+            break
+
+        i, j = now
 
         for k in range(4):
             di, dj = i + movement[k][0], j + movement[k][1]
 
-            if di < 0 or di >= N or dj < 0 or dj >= M:
+            if di < 0 or di >= N or dj < 0 or dj >= N:
+                continue
+
+            if arr[di][dj] != 0:
                 continue
 
 
-            if lab[di][dj] == 0:
-                lab[di][dj] = 2
-                q.append((di, dj))
-                cnt += 1
-            else: # lab[di][dj] = 1 or 2 => 벽이거나 바이러스이므로 스킵
+            arr[di][dj] = (n-1) % K + 1
+            heapq.heappush(pq, ((n+K),(di, dj)) )
+
+q = sorted(pq)
+
+def infect_queue(q, K, S):
+
+    movement = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+    queue = deque(q)
+
+    while queue:
+
+
+        n, second, now = queue.popleft()
+        print(second)
+
+        if second == S: # 종료조건
+            break
+
+        i, j = now
+
+        for k in range(4):
+            di, dj = i + movement[k][0], j + movement[k][1]
+
+            if di < 0 or di >= N or dj < 0 or dj >= N:
                 continue
 
-    
-    print_graph(lab)
-    sleep(1)
+            if arr[di][dj] != 0:
+                continue
 
-    for i in range(N):
-        for j in range(M):
-            if lab[i][j] == 0:
-                cnt += 1
-            elif lab[i][j] == 2:
-                lab[i][j] = 0
-    
-    for virus in viruses:
-        i, j = virus
-        lab[i][j] = 2
-    
-    return cnt # return len(empty) - 3 - infected  => 원래 빈 공간에서 세운 벽 3개를 빼고, 새로 감염된 수(bfs 하면서 세기) 빼면 시간복잡도 최적화
-
-N, M = map(int, input().split())
-
-lab = []
-empties = []
-viruses = []
-
-result = 0
-
-for i in range(N):
-    lab.append(list(map(int, input().split())))
-
-# 빈칸, 바이러스 위치 구하기
-for i in range(N):
-    for j in range(M):
-        if lab[i][j] == 0:
-            empties.append((i, j))
-        elif lab[i][j] == 2:
-            viruses.append((i, j))
+            arr[di][dj] = n
+            print_graph(arr)
+            queue.append((n, second+1, (di, dj)))
 
 
-# 벽 세우기
-def backtracking(start, length, N, M):
-    global result
+infect_pq(pq, K, S)
+#infect_queue(q, K, S)
 
-    if length == 3:
-        print_graph(lab)
-        sleep(1)
-        result = max(result, bfs(lab, viruses, N, M))
-        return
-
-    
-    for i in range(start, len(empties)):
-        x, y = empties[i]
-        lab[x][y] = 1 # 벽 세우기
-        backtracking(i + 1, length + 1, N, M)
-        lab[x][y] = 0 # 벽 지우기
-
-
-
-# 반복 후 안전 영역의 최댓값 출력
-backtracking(0, 0, N, M)
-print(result)
+print(arr[X-1][Y-1])
