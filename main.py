@@ -1,115 +1,74 @@
 '''
 
-3 3
-1 0 2
-0 0 0
-3 0 0
-2 3 2
+입력 예시 1
+2
+5 6
+0 0 1 0
 
+출력 예시 1
+30
+30
+
+입력 예시 2
 3
+3 4 5
+1 0 1 0
 
-3 3
-1 0 2
-0 0 0
-3 0 0
-0 2 2
+출력 예시 2
+35 17
 
-0
+입력 예시 3
+6
+1 2 3 4 5 6
+2 1 1 1
+
+출력 예시 3
+54
+-24
 
 '''
 
+N = int(input())
 
-from sys import stdin
-input = stdin.readline
+arr = list(map(int, input().split()))
+add, sub, mul, div = map(int, input().split()) # + - x /
 
-import heapq
-from collections import deque
+max_val = -(int(1e9))
+min_val = int(1e9)
+n = len(arr)
+    
 
-N, K = map(int, input().split())
+def backtracking(i, num):
 
-arr = []
+    global max_val, min_val, add, sub, mul, div, n
 
-for i in range(N):
-    arr.append(list(map(int, input().split())))
+    if i == n-1:
+        print(num)
+        max_val = max(max_val, num)
+        min_val = min(min_val, num)
+    else:
 
-S, X, Y = map(int, input().split()) # S초 뒤에 arr[X][Y]에 있는 바이러스의 종류는?
+        if add > 0:
+            add -= 1
+            backtracking(i + 1, num + arr[i+1])
+            add += 1
+        
+        if sub > 0:
+            sub -= 1
+            backtracking(i + 1, num - arr[i+1])
+            sub += 1
+        
+        if mul > 0:
+            mul -= 1
+            backtracking(i + 1, num * arr[i+1])
+            mul += 1
 
-pq = []
+        if div > 0:
+            div -= 1
+            backtracking(i + 1, num // arr[i+1])
 
-for i in range(N):
-    for j in range(N):
-        if arr[i][j] != 0:
-            pq.append((arr[i][j], (i, j)))
+        
 
-def print_graph(arr):
-    print()
+backtracking(0, arr[0])
+print(max_val, min_val)
 
-    for i in arr:
-        for j in i:
-            print(j, end = ' ')
-        print()
-
-def infect_pq(pq, K, S):
-
-    heapq.heapify(pq)
-    movement = [(-1, 0), (1, 0), (0, -1), (0, 1)]
-
-    while pq:
-
-
-        n, now = heapq.heappop(pq)
-
-        if ( (n-1) // K ) == S: # 종료조건
-            break
-
-        i, j = now
-
-        for k in range(4):
-            di, dj = i + movement[k][0], j + movement[k][1]
-
-            if di < 0 or di >= N or dj < 0 or dj >= N:
-                continue
-
-            if arr[di][dj] != 0:
-                continue
-
-
-            arr[di][dj] = (n-1) % K + 1
-            heapq.heappush(pq, ((n+K),(di, dj)) )
-
-q = sorted(pq)
-
-def infect_queue(q, K, S):
-
-    movement = [(-1, 0), (1, 0), (0, -1), (0, 1)]
-    queue = deque(q)
-
-    while queue:
-
-
-        n, second, now = queue.popleft()
-        print(second)
-
-        if second == S: # 종료조건
-            break
-
-        i, j = now
-
-        for k in range(4):
-            di, dj = i + movement[k][0], j + movement[k][1]
-
-            if di < 0 or di >= N or dj < 0 or dj >= N:
-                continue
-
-            if arr[di][dj] != 0:
-                continue
-
-            arr[di][dj] = n
-            print_graph(arr)
-            queue.append((n, second+1, (di, dj)))
-
-
-infect_pq(pq, K, S)
-#infect_queue(q, K, S)
-
-print(arr[X-1][Y-1])
