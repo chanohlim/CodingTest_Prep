@@ -1,97 +1,109 @@
 '''
 
-5
-X S X X T
-T X S X X
-X X X X X
-X T X X X
-X X T X X
+입력 예시 1
+2
+5 6
+0 0 1 0
 
-YES
+출력 예시 1
+30
+30
 
-4
-S S S T
-X X X X
-X X X X
-T T T X
+입력 예시 2
+3
+3 4 5
+1 0 1 0
 
-NO
+출력 예시 2
+35 17
+
+입력 예시 3
+6
+1 2 3 4 5 6
+2 1 1 1
+
+출력 예시 3
+54
+-24
 
 '''
 
 N = int(input())
 
-graph = []
+arr = list(map(int, input().split()))
+add, sub, mul, div = map(int, input().split())
 
-for i in range(N):
-    graph.append(list(input().split()))
+max_val = -(int(1e9))
+min_val = int(1e9)
 
-teachers = []
-answer = False
+answer = []
+operator = []
 
-for i in range(N):
-    for j in range(N):
-        if graph[i][j] == 'T':
-            teachers.append((i, j))
+operator += [0] * add
+operator += [1] * sub
+operator += [2] * mul
+operator += [3] * div
 
-def print_arr(graph):
-    print()
+visited = [False] * len(operator)
 
-    for i in graph:
-        for j in i:
-            print(j, end = ' ')
-        print()
+def backtracking_1(i, now, add, sub, mul, div):
+
+    global max_val, min_val
+
+    if i == len(arr) - 1:
+        max_val = max(max_val, now)
+        min_val = min(min_val, now)
+        return
+
+    else:
+
+        if add > 0:
+            backtracking_1(i + 1, now + arr[i + 1], add - 1, sub, mul, div)
+
+        if sub > 0:
+            backtracking_1(i + 1, now - arr[i + 1], add, sub - 1, mul, div)
+
+        if mul > 0:
+            backtracking_1(i + 1, now * arr[i + 1], add, sub, mul - 1, div)
+
+        if div > 0:
+            backtracking_1(i + 1, int(now / arr[i + 1]), add, sub, mul, div - 1)
+
+
+def op(i, a, b):
+
+    if i == 0:
+        return a + b
+    elif i == 1:
+        return a - b
+    elif i == 2:
+        return a * b
+    elif i == 3:
+        return int(a / b)
+
+def backtracking_2(now, length):
+
+    if length == len(operator):
+        answer.append(now)
+        return
     
-    print()
+    for i in range(len(operator)):
 
-def radar():
-
-    direction = [(-1, 0), (1, 0), (0, -1), (0, 1)]
-    for teacher in teachers:
-        i, j = teacher
-        for k in range(4):
-            
-            di, dj = i + direction[k][0], j + direction[k][1]
-
-            while di >= 0 and di < N and dj >= 0 and dj < N:
-                if graph[di][dj] == 'O':
-                    break
-
-                if graph[di][dj] == 'S':
-                    return False
-
-                di += direction[k][0]
-                dj += direction[k][1]
-
-    return True
-
-
-def backtracking(start, length, N):
-    global answer
-
-    if answer:
-        return
-
-    if length == 3:
-        answer = answer or radar()
-        #print_arr(graph)
-        return
-
-    for i in range(start, N*N):
-        a = i // N
-        b = i % N
-
-        if graph[a][b] != 'X':
+        if visited[i]:
             continue
 
-        graph[a][b] = 'O'
-        backtracking(i + 1, length + 1, N)
-        graph[a][b] = 'X'
-        
+        if operator[i] == operator[i-1] and not visited[i-1]:
+            continue
 
-backtracking(0, 0, N)
+        visited[i] = True
+        new = op(operator[i], now, arr[length + 1])
 
-if answer:
-    print("YES")
-else:
-    print("NO")
+        backtracking_2(new, length + 1)
+
+        visited[i] = False
+
+
+backtracking_1(0, arr[0], add, sub, mul, div)
+print(max_val, min_val)
+backtracking_2(arr[0], 0)
+print(max(answer), min(answer))

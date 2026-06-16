@@ -90,11 +90,32 @@ def backtracking(start, length):
         backtracking(i + 1, length + 1)
         graph[x][y] = 'X'
 
+def backtracking2(start, length, N):
+    global answer
+
+    if answer:
+        return
+
+    if length == 3:
+        answer = answer or track()
+        #print_arr(graph)
+        return
+
+    for i in range(start, N*N):
+        a = i // N
+        b = i % N
+
+        if graph[a][b] != 'X':
+            continue
+
+        graph[a][b] = 'O'
+        backtracking2(i + 1, length + 1, N)
+        graph[a][b] = 'X'
 
 
 backtracking(0, 0)
 
-if answer: # 
+if answer:
     print("YES")
 else:
     print("NO")
