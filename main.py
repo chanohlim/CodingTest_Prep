@@ -1,109 +1,126 @@
 '''
 
-입력 예시 1
+2 20 50
+50 30
+20 40
+
+1
+
+2 40 50
+50 30
+20 40
+
+0
+
+2 20 50
+50 30
+30 40
+
+1
+
+3 5 10
+10 15 20
+20 30 25
+40 22 10
+
 2
-5 6
-0 0 1 0
 
-출력 예시 1
-30
-30
+4 10 50
+10 100 20 90
+80 100 60 70
+70 20 30 40
+50 20 100 10
 
-입력 예시 2
 3
-3 4 5
-1 0 1 0
-
-출력 예시 2
-35 17
-
-입력 예시 3
-6
-1 2 3 4 5 6
-2 1 1 1
-
-출력 예시 3
-54
--24
 
 '''
+from collections import deque
+from time import sleep
 
-N = int(input())
+N, L, R = map(int, input().split())
 
-arr = list(map(int, input().split()))
-add, sub, mul, div = map(int, input().split())
+A = []
+movement = [(-1, 0), (1, 0), (0, -1), (0, 1)]
 
-max_val = -(int(1e9))
-min_val = int(1e9)
+for i in range(N):
+    A.append(list(map(int, input().split())))
 
-answer = []
-operator = []
-
-operator += [0] * add
-operator += [1] * sub
-operator += [2] * mul
-operator += [3] * div
-
-visited = [False] * len(operator)
-
-def backtracking_1(i, now, add, sub, mul, div):
-
-    global max_val, min_val
-
-    if i == len(arr) - 1:
-        max_val = max(max_val, now)
-        min_val = min(min_val, now)
-        return
-
-    else:
-
-        if add > 0:
-            backtracking_1(i + 1, now + arr[i + 1], add - 1, sub, mul, div)
-
-        if sub > 0:
-            backtracking_1(i + 1, now - arr[i + 1], add, sub - 1, mul, div)
-
-        if mul > 0:
-            backtracking_1(i + 1, now * arr[i + 1], add, sub, mul - 1, div)
-
-        if div > 0:
-            backtracking_1(i + 1, int(now / arr[i + 1]), add, sub, mul, div - 1)
-
-
-def op(i, a, b):
-
-    if i == 0:
-        return a + b
-    elif i == 1:
-        return a - b
-    elif i == 2:
-        return a * b
-    elif i == 3:
-        return int(a / b)
-
-def backtracking_2(now, length):
-
-    if length == len(operator):
-        answer.append(now)
-        return
+def print_graph(arr):
     
-    for i in range(len(operator)):
-
-        if visited[i]:
-            continue
-
-        if operator[i] == operator[i-1] and not visited[i-1]:
-            continue
-
-        visited[i] = True
-        new = op(operator[i], now, arr[length + 1])
-
-        backtracking_2(new, length + 1)
-
-        visited[i] = False
+    print()
+    for i in arr:
+        for j in i:
+            print(j, end = ' ')
+        print()
+    print()
 
 
-backtracking_1(0, arr[0], add, sub, mul, div)
-print(max_val, min_val)
-backtracking_2(arr[0], 0)
-print(max(answer), min(answer))
+def bfs(start, N, country, L, R):
+
+    global moved
+
+    i, j = start
+    cnt = 1
+
+    q = deque()
+    q.append((i, j))
+    B[i][j] = country
+
+    population = A[i][j]
+    
+    while q:
+        
+        i, j = q.popleft()
+        B[i][j] = country # 방문 처리 (연합 처리)
+
+        for k in range(4):
+            di, dj = i + movement[k][0], j + movement[k][1]
+
+            if di < 0 or di >= N or dj < 0 or dj >= N:
+                continue
+
+            if (L <= abs(A[i][j] - A[di][dj]) <= R) and (B[di][dj] == 0): # 연합 조건
+                population += A[di][dj]
+                B[di][dj] = country
+                q.append((di, dj))
+                cnt += 1
+    
+    if cnt > 1:
+        moved = True
+
+    return (population//cnt)
+
+
+answer = 0
+
+while True:
+
+    moved = False
+
+    B = [[0] * N for i in range(N)]
+
+    country = 1
+    p = []
+
+    for i in range(N):
+        for j in range(N):
+            if B[i][j] == 0:
+                population = bfs((i,j), N, country, L, R)
+                p.append(population)
+                country += 1
+
+
+    for i in range(N):
+        for j in range(N):
+            A[i][j] = p[B[i][j] - 1]
+
+
+    #if country == N*N + 1:
+    if not moved:
+        break
+
+    answer += 1
+
+                
+print(answer)
+

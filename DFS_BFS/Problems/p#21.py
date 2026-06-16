@@ -34,97 +34,92 @@
 3
 
 '''
-
 from collections import deque
+from time import sleep
 
 N, L, R = map(int, input().split())
 
-graph = []
+A = []
+movement = [(-1, 0), (1, 0), (0, -1), (0, 1)]
 
 for i in range(N):
-    graph.append(list(map(int, input().split())))
+    A.append(list(map(int, input().split())))
 
-temp = [([0] * N) for i in range(N)]
-sum_pop = [0 for i in range(N*N + 1)]
-
-move = [(-1, 0), (1, 0), (0, -1), (0, 1)]
-
-def unite(i, j, nation):
-
+def print_graph(arr):
     
-    q = deque()
-    q.append((i, j))
-    temp[i][j] = nation
-
-    cnt = 1
-
-    while q:
-        i, j = q.popleft()
-
-        for k in range(4):
-            di, dj = i + move[k][0], j + move[k][1]
-
-            if (di < 0) or (di >= N) or (dj < 0) or (dj >= N):
-                continue
-
-            if temp[di][dj] == 0:
-                if L <= abs(graph[i][j] - graph[di][dj]) <= R: # 국경선이 열리는 조건
-                    sum_pop[nation] += graph[di][dj]
-                    temp[di][dj] = nation
-                    cnt += 1
-                    q.append((di, dj))
-
-    return cnt
-
-
-def print_graph(graph):
-
     print()
-
-    for i in graph:
+    for i in arr:
         for j in i:
             print(j, end = ' ')
         print()
+    print()
 
 
+def bfs(start, N, country, L, R):
 
+    global moved
 
-def population():
+    i, j = start
+    cnt = 1
 
+    q = deque()
+    q.append((i, j))
+    B[i][j] = country
 
-    nation = 1
-
-    for i in range(N):
-        for j in range(N):
-            if temp[i][j] == 0:
-                sum_pop[nation] += graph[i][j]
-                cnt = unite(i, j, nation)
-                sum_pop[nation] = sum_pop[nation] // cnt
-                nation += 1
-
-
-    for i in range(N):
-        for j in range(N):
-            graph[i][j] = sum_pop[temp[i][j]]
-
-    return nation
-
-
-cnt = 0
-
+    population = A[i][j]
     
+    while q:
+        
+        i, j = q.popleft()
+        B[i][j] = country # 방문 처리 (연합 처리)
+
+        for k in range(4):
+            di, dj = i + movement[k][0], j + movement[k][1]
+
+            if di < 0 or di >= N or dj < 0 or dj >= N:
+                continue
+
+            if (L <= abs(A[i][j] - A[di][dj]) <= R) and (B[di][dj] == 0): # 연합 조건
+                population += A[di][dj]
+                B[di][dj] = country
+                q.append((di, dj))
+                cnt += 1
+    
+    if cnt > 1:
+        moved = True
+
+    return (population//cnt)
+
+
+answer = 0
+
 while True:
 
-    temp = [([0] * N) for i in range(N)]
-    sum_pop = [0 for i in range(N*N + 1)]
+    moved = False
 
-    nation = population()
-    if nation == (N*N + 1):
+    B = [[0] * N for i in range(N)]
+
+    country = 1
+    p = []
+
+    for i in range(N):
+        for j in range(N):
+            if B[i][j] == 0:
+                population = bfs((i,j), N, country, L, R)
+                p.append(population)
+                country += 1
+
+
+    for i in range(N):
+        for j in range(N):
+            A[i][j] = p[B[i][j] - 1]
+
+
+    #if country == N*N + 1:
+    if not moved:
         break
 
-    temp = [([0] * N) for i in range(N)]
-    sum_pop = [0 for i in range(N*N + 1)]
+    answer += 1
 
-    cnt += 1
-
-print(cnt)
+                
+print(answer)
