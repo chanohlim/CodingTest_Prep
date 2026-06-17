@@ -39,23 +39,27 @@ def print_graph(arr):
     print()
     
 def moveable(i, N):
+    global current
+
+    print(current, i, end = ' ')
     
     if current[0][0] == current[1][0]: # horizontal
         state = 0
+        print('horizontal!', end = ' ')
     else:
         state = 1
-
-    prev = [x[:] for x in current]
-
+        print('vertical!', end = ' ')
+    
     if state == 0: # horizontal
         current.sort(key = lambda x: x[1])
-        left, right = current            
+        left, right = current
         
         left[0] += movement1[i][0][0]
         left[1] += movement1[i][0][1]
         right[0] += movement1[i][1][0]
         right[1] += movement1[i][1][1]
         
+        current = [left, right]
         
         
     elif state == 1: # vertical
@@ -66,27 +70,33 @@ def moveable(i, N):
         top[1] += movement2[i][0][1]
         bottom[0] += movement2[i][1][0]
         bottom[1] += movement2[i][1][1]
+        
+        current = [top, bottom]
 
-    if 
+    print(current, end = ' ')
+        
     
     if (current[0][0] < 0 or current[0][0] >= N - 1
         or current[0][1] < 0 or current[0][1] >= N - 1
         or current[1][0] < 0 or current[1][0] >= N - 1
         or current[1][1] < 0 or current[1][1] >= N - 1): # out of range
         
+        print(False)
         return False
     
     if ( (board[current[0][0]][current[0][1]] == 1)
         or (board[current[1][0]][current[1][1]] == 1)): # wall
         
+        print(False)
         return False
     
+    print(True, current)
     return True
         
     
 def backtracking(time, N, board):
     
-    global answer
+    global answer, current
     
     if time > 8:
         return
@@ -94,7 +104,7 @@ def backtracking(time, N, board):
     left, right = current
     
     if ( (left[0] == N - 1 and left[1] == N - 1)
-        or (right[0] == N - 1 and right[1] == N - 1)): # 종료 조건
+        or (right[0] == N - 1 and right[1] == N - 1)):
         
         answer = min(answer, time)
         return
@@ -102,36 +112,24 @@ def backtracking(time, N, board):
     
     for i in range(8):
         
-        prev = [x[:] for x in current] # 이전 상태로 되돌리기 위한 코드
-
+        prev = current
+        print(prev)
+        
         if not moveable(i, N): # not moveable
-
-            current[0][0] = prev[0][0]
-            current[0][1] = prev[0][1]
-            current[1][0] = prev[1][0]
-            current[1][1] = prev[1][1]
-
+            current = prev # rollback
             continue
-
-        board[prev[0][0]][prev[0][1]] = 0
-        board[prev[1][0]][prev[1][1]] = 0
+            
         board[current[0][0]][current[0][1]] = 2
         board[current[1][0]][current[1][1]] = 2
         
-        #print(current)
         #print_graph(board)
         
         backtracking(time + 1, N, board)
         
+        
         board[current[0][0]][current[0][1]] = 0
         board[current[1][0]][current[1][1]] = 0
-        board[prev[0][0]][prev[0][1]] = 2
-        board[prev[1][0]][prev[1][1]] = 2
-
-        current[0][0] = prev[0][0]
-        current[0][1] = prev[0][1]
-        current[1][0] = prev[1][0]
-        current[1][1] = prev[1][1]
+        current = prev # rollback for another recursion
     
 
 def solution(board):
@@ -145,4 +143,3 @@ def solution(board):
     return answer
 
 solution(board)
-print(answer)
