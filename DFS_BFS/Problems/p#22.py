@@ -1,145 +1,63 @@
-from time import sleep
-
-answer = int(1e9)
+from collections import deque
 
 board = [[0, 0, 0, 1, 1],[0, 0, 0, 1, 0],[0, 1, 0, 1, 1],[1, 1, 0, 0, 1],[0, 0, 0, 0, 0]]
 
-movement1 = [ # horizontal
-    [(-1, 0), (-1, 0)], # 0
-    [(1, 0), (1, 0)],   # 1
-    [(0, -1), (0, -1)], # 2
-    [(0, 1), (0, 1)],   # 3
-    [(0, 0), (1, -1)],  # 4
-    [(-1, 1), (0, 0)],  # 5
-    [(1, 1), (0, 0)],   # 6
-    [(0, 0), (-1, -1)]  # 7
-]
+def get_next_pos(pos, board):
+    next_pos = []
+    pos = list(pos)
+    x1, y1, x2, y2 = pos[0][0], pos[0][1], pos[1][0], pos[1][1]
 
-movement2 = [ # vertical
-    [(-1, 0), (-1, 0)], # 0
-    [(1, 0), (1, 0)],   # 1
-    [(0, -1), (0, -1)], # 2
-    [(0, 1), (0, 1)],   # 3
-    [(0, 0), (-1, -1)],  # 4
-    [(1, 1), (0, 0)],  # 5
-    [(0, 0), (-1, 1)],   # 6
-    [(1, -1), (0, 0)]  # 7
-]
+    # 상 하 좌 우
+    dx = [-1, 1, 0, 0]
+    dy = [0, 0, -1, 1]
 
-current = [[0, 0], [0, 1]]
+    for k in range(4):
+        dx1, dy1, dx2, dy2 = x1 + dx[k], y1 + dy[k], x2 + dx[k], y2 + dy[k]
 
-def print_graph(arr):
-    print()
-    
-    for i in arr:
-        for j in i:
-            print(j, end = ' ')
-        print()
-        
-    print()
-    
-def moveable(i, N):
-    global current
+        if board[dx1][dy1] == 0 and board[dx2][dy2] == 0:
+            next_pos.append({(dx1, dy1), (dx2, dy2)})
 
-    print(current, i, end = ' ')
-    
-    if current[0][0] == current[1][0]: # horizontal
-        state = 0
-        print('horizontal!', end = ' ')
-    else:
-        state = 1
-        print('vertical!', end = ' ')
-    
-    if state == 0: # horizontal
-        current.sort(key = lambda x: x[1])
-        left, right = current
-        
-        left[0] += movement1[i][0][0]
-        left[1] += movement1[i][0][1]
-        right[0] += movement1[i][1][0]
-        right[1] += movement1[i][1][1]
-        
-        current = [left, right]
-        
-        
-    elif state == 1: # vertical
-        current.sort()
-        top, bottom = current
-        
-        top[0] += movement2[i][0][0]
-        top[1] += movement2[i][0][1]
-        bottom[0] += movement2[i][1][0]
-        bottom[1] += movement2[i][1][1]
-        
-        current = [top, bottom]
+    if x1 == x2:
+        for i in [-1, 1]:
+            if board[x1 + i][y1] == 0 and board[x2 + i][y2] == 0:
+                next_pos.append({(x1, y1), (x1 + i, y1)})
+                next_pos.append({(x2, y2), (x2 + i, y2)})
 
-    print(current, end = ' ')
-        
-    
-    if (current[0][0] < 0 or current[0][0] >= N - 1
-        or current[0][1] < 0 or current[0][1] >= N - 1
-        or current[1][0] < 0 or current[1][0] >= N - 1
-        or current[1][1] < 0 or current[1][1] >= N - 1): # out of range
-        
-        print(False)
-        return False
-    
-    if ( (board[current[0][0]][current[0][1]] == 1)
-        or (board[current[1][0]][current[1][1]] == 1)): # wall
-        
-        print(False)
-        return False
-    
-    print(True, current)
-    return True
-        
-    
-def backtracking(time, N, board):
-    
-    global answer, current
-    
-    if time > 8:
-        return
-    
-    left, right = current
-    
-    if ( (left[0] == N - 1 and left[1] == N - 1)
-        or (right[0] == N - 1 and right[1] == N - 1)):
-        
-        answer = min(answer, time)
-        return
-    
-    
-    for i in range(8):
-        
-        prev = current
-        print(prev)
-        
-        if not moveable(i, N): # not moveable
-            current = prev # rollback
-            continue
-            
-        board[current[0][0]][current[0][1]] = 2
-        board[current[1][0]][current[1][1]] = 2
-        
-        #print_graph(board)
-        
-        backtracking(time + 1, N, board)
-        
-        
-        board[current[0][0]][current[0][1]] = 0
-        board[current[1][0]][current[1][1]] = 0
-        current = prev # rollback for another recursion
-    
+    elif y1 == y2:
+        for i in [-1, 1]:
+            if board[x1][y1 + i] == 0 and board[x2][y2 + i] == 0:
+                next_pos.append({(x1, y1), (x1, y1 + i)})
+                next_pos.append({(x2, y2), (x2, y2 + i)})
+
+    print(next_pos)
+    return next_pos # 현재 위치에서 이동할 수 있는 위치를 반환
+
 
 def solution(board):
-    global answer
-    
-    N = len(board)
-    
-    backtracking(0, N, board)
-    
-    
-    return answer
 
-solution(board)
+    n = len(board)
+    new_board = [[1] * (n + 2) for _ in range(n + 2)]
+    for i in range(n):
+        for j in range(n):
+            new_board[i + 1][j + 1] = board[i][j]
+
+    q = deque()
+    visited = []
+    pos = {(1,1), (1,2)}
+    q.append((pos, 0))
+    visited.append(pos)
+
+    while q:
+        pos, cost = q.popleft()
+
+        if (n, n) in pos:
+            return cost
+
+        for next_pos in get_next_pos(pos, new_board):
+            if next_pos not in visited:
+                q.append((next_pos, cost + 1))
+                visited.append(next_pos)
+
+    return 0
+
+print(solution(board))
