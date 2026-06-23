@@ -8,34 +8,26 @@ N	stages	                    result
 '''
 
 def solution(N, stages):
-    
     answer = []
-    
-    stages.sort()
-    count = [0] * (N + 2)
-
-    for i in stages:
-        count[i] += 1
-    
     length = len(stages)
+    
     for i in range(1, N + 1):
-        length -= count[i]
-
-        if length == 0:
-            break
         
-        count[i] /= length + count[i]
+        count = stages.count(i)
+        
+        if length == 0:
+            fail = 0
+        else:
+            
+            fail = count / length
+            length -= count
+            
+        answer.append((i, fail))
+        
+    answer.sort(key=lambda x: -x[1])
     
-    count_index = []
-    for i in range(1, N + 1):
-        count_index.append((i, count[i]))
-    
-    count_index.sort(key = lambda x: -x[1])
-
-    for a, b in count_index:
-        answer.append(a)
-
-    return answer
+        
+    return [i[0] for i in answer]
 
 '''N = 5
 stages = [2, 1, 2, 6, 2, 4, 3, 3]'''
@@ -45,3 +37,38 @@ stages = [4, 4, 4, 4, 4]
 # 1 2 2 2 3 3 4 6
 
 print(solution(N, stages))
+
+def solution2(N, stages):
+    answer = []
+    
+    failure = [[i+1, 0] for i in range(N)]
+    stages.sort()
+    n = len(stages)
+    
+    cnt = 0
+    current = 1
+    i = 0
+    
+    while (i < len(stages)):
+        
+        if stages[i] == current:
+            cnt += 1
+            i += 1
+            
+        elif stages[i] > current:
+            failure[current-1][1] = cnt / n
+            n -= cnt
+            cnt = 0
+            current += 1
+    
+    if current != (N + 1):
+        failure[current-1][1] = cnt / n
+        
+    
+    failure.sort(key=lambda x: (-x[1], x[0]))
+    
+    for a,b in failure:
+        answer.append(a)
+    
+    
+    return answer
