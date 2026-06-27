@@ -1,9 +1,16 @@
 '''
 
-3
 10
+5
+10
+15
 20
+25
+30
+35
 40
+45
+50
 
 100
 
@@ -12,30 +19,22 @@ import heapq
 
 N = int(input())
 
-arr = []
-
+cards = []
 for i in range(N):
-    arr.append(int(input()))
+    cards.append(int(input()))
 
+total = 0
+heapq.heapify(cards)
 
-if N == 1:
-    print(0)
+while N >= 2:
+    print(cards)
 
-else:
+    a = heapq.heappop(cards)
+    b = heapq.heappop(cards)
 
-    heapq.heapify(arr)
-    result = 0
+    total += (a + b)
+    heapq.heappush(cards, a + b)
 
-    while arr:
+    N -= 1
 
-        a = heapq.heappop(arr)
-        b = heapq.heappop(arr)
-
-        result += (a + b)
-
-        if not arr:
-            break
-
-        heapq.heappush(arr, a + b)
-    
-    print(result)
+print(total)

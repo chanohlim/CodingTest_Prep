@@ -1,40 +1,39 @@
 '''
 
-10
-5
-10
-15
-20
-25
-30
-35
-40
-45
-50
+입력 예시:
+4 6
+19 15 10 17
 
-100
+출력 예시:
+15
 
 '''
-import heapq
 
-N = int(input())
+N, M = map(int, input().split())
 
-cards = []
-for i in range(N):
-    cards.append(int(input()))
+arr = list(map(int, input().split()))
 
-total = 0
-heapq.heapify(cards)
 
-while N >= 2:
-    print(cards)
+def binary(start, end, M):
 
-    a = heapq.heappop(cards)
-    b = heapq.heappop(cards)
+    while start <= end:
 
-    total += (a + b)
-    heapq.heappush(cards, a + b)
+        mid = (start + end) // 2 # 절단기에 설정할 수 있는 높이
+        
+        total = 0
 
-    N -= 1
+        for cake in arr:
+            if cake > mid:
+                total += cake - mid
 
-print(total)
+        if total >= M: # 조건 만족 => 절단기 높이 높여서 최적화
+            answer = mid
+            start = mid + 1
+        else:
+            end = mid - 1
+
+    
+    return answer
+            
+
+print(binary(0, max(arr), M))

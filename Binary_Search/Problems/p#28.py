@@ -12,26 +12,21 @@
 '''
 
 N = int(input())
-
 arr = list(map(int, input().split()))
 
-def binary():
+def binary(start, end):
 
-    start = 0
-    end = N - 1
+    if start > end:
+        return -1
+    
+    mid = (start + end) // 2
 
-    while start <= end:
-        mid = (start + end) // 2
+    if arr[mid] == mid:
+        return mid
 
-        if arr[mid] == mid:
-            return mid
-        
-        elif arr[mid] < mid:
-            start = mid + 1
-        
-        else:
-            end = mid - 1
+    elif arr[mid] < mid: # 좌측은 무조건 idx보다 arr[idx]가 작음
+        return binary(mid + 1, end)
+    elif arr[mid] > mid: # 우측은 무조건 idx보다 arr[idx]가 큼
+        return binary(start, mid - 1)
 
-    return -1
-
-print(binary())
+print(binary(0, len(arr) - 1))
