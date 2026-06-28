@@ -7,59 +7,40 @@
 1 3 1 5 2 2 4 1 5 0 2 3 0 6 1 2
 
 '''
-
-from copy import deepcopy
-
-def max_val (arr):
-
-    result = arr[0][0]
-
-    for i in arr:
-        for j in i:
-            if j > result:
-                result = j
-
-    return result
-
-def input_gold(N, M):
-    dp = [[0] * M for k in range(N)] 
-    temp = list(map(int, input().split()))
-
-    row = 0
-    col = 0
-    for j in temp:
-        if col == M:
-            col = 0
-            row += 1
-
-        dp[row][col] = j
-        col += 1
-    
-    return dp
-
-def print_arr(arr):
-    for i in arr:
-        for j in i:
-            print(j, end=' ')
-        print()
+movement = [-1, 0, 1]
 
 T = int(input())
 
-movement = [(-1, 1), (0, 1), (1, 1)]
+for t in range(T):
 
-for case in range(T):
+    n, m = map(int, input().split())
+    temp = list(map(int, input().split()))
 
-    N, M = map(int, input().split())
+    arr = []
 
-    dp = input_gold(N, M)
-    origin = deepcopy(dp)
+    for i in range(n):
+        arr.append(temp[i*m:(i+1)*m])
 
-    for j in range(M):
-        for i in range(N):
-            for k in movement:
-                di, dj = i + k[0], j + k[1]
+    dp = [[0] * m for i in range(n)]
 
-                if 0 <= di < N and 0 <= dj < M:
-                    dp[di][dj] = max(dp[di][dj], dp[i][j] + origin[di][dj])
+    for i in range(n):
+        dp[i][0] = arr[i][0]
 
-    print(max_val(dp))
+    for j in range(m-1):
+        for i in range(n):
+
+            '''for k in movement:
+                di, dj = i + k, j + 1
+
+                if di < 0 or di >= n or dj < 0 or dj >= m:
+                    continue
+
+                dp[di][dj] = max(dp[di][dj], dp[i][j] + arr[di][dj])'''
+
+            left_up = dp[i-1][j] if i>0 else 0
+            left = dp[i][j]
+            left_down = dp[i+1][j] if i<n-1 else 0
+
+            dp[i][j+1] = arr[i][j+1] + max(left_up, left, left_down)
+
+    print(max(dp[i][m-1] for i in range(n)))
