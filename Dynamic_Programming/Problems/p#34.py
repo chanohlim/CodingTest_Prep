@@ -28,9 +28,9 @@ def bisect_LIS(n):
 
     for x in a:
         pos = bisect_left(lis, x)
-        if pos == len(lis):
+        if pos == len(lis): # x가 lis에 있는 모든 원소들보다 더 크다
             lis.append(x)
-        else:
+        else: # x가 기존 lis[pos]보다 작은 값이므로, 교체를 해서 lis의 길이를 최대로 늘릴 수 있게 한다.
             lis[pos] = x
 
     return n - len(lis)

@@ -56,63 +56,22 @@
 '''
 
 N = int(input())
+arr = []
 
-def bottom_up(N):
+dp = [0] * (N + 1)
 
-    schedule = [0]
-    dp = [0]
-
-    for i in range(N):
-        T, P = map(int, input().split())
-        schedule.append(T)
-        dp.append(P)
+for i in range(N):
+    t, p = map(int, input().split())
+    arr.append((t, p)) # arr[i]: i+1일의 상담 일정표
 
 
-    for i in range(1, N + 1):
+for i in range(N-1, -1, -1):
+    t, p = arr[i]
 
-        temp = []
-        for j in range(1, i):
-            if j + schedule[j] <= i:
-                temp.append(dp[j])
-
-        if temp:
-            dp[i] += max(temp)
-
-    result = []
-
-    for i in range(1, N+1):
-        if i + schedule[i] <= N + 1:
-            result.append(dp[i])
-    if result:
-        print(max(result))
-    else:
-        print(0)
+    if i + t > N:
+        dp[i] = dp[i + 1] # 만약 상담을 하지 못하는 경우면, 상담을 안하는 경우로 값 변경(어차피 최댓값이므로)
     
+    else:
+        dp[i] = max(dp[i + 1], p + dp[i + t]) # 선택 안하는 경우와 선택하는 경우
 
-def top_down(N):
-    t = []
-    p = []
-    dp = [0] * (N + 1)
-    max_value = 0
-
-    for i in range(N):
-        T, P = map(int, input().split())
-        t.append(T)
-        p.append(P)
-
-    for i in range(N-1, -1, -1): # N-1 ~ 0까지 거꾸로 확인
-        time = t[i] + i
-
-        if time <= N:
-            dp[i] = max(p[i] + dp[time], max_value)
-            max_value = dp[i]
-        
-        else:
-            dp[i] = max_value
-
-    print(max_value)
-
-top_down(N)
-
-
-
+print(dp)
