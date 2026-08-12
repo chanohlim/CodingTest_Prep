@@ -17,13 +17,13 @@ def get_next_pos(pos, board):
         if board[dx1][dy1] == 0 and board[dx2][dy2] == 0:
             next_pos.append({(dx1, dy1), (dx2, dy2)})
 
-    if x1 == x2:
+    if x1 == x2: # 세로
         for i in [-1, 1]:
             if board[x1 + i][y1] == 0 and board[x2 + i][y2] == 0:
                 next_pos.append({(x1, y1), (x1 + i, y1)})
                 next_pos.append({(x2, y2), (x2 + i, y2)})
 
-    elif y1 == y2:
+    elif y1 == y2: # 가로
         for i in [-1, 1]:
             if board[x1][y1 + i] == 0 and board[x2][y2 + i] == 0:
                 next_pos.append({(x1, y1), (x1, y1 + i)})

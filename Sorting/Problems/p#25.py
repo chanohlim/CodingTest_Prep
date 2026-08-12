@@ -60,10 +60,10 @@ def solution2(N, stages):
             n -= cnt
             cnt = 0
             current += 1
-    
-    if current != (N + 1):
+
+    if current != (N + 1): # 계산되지 않은 마지막 스테이지의 실패율을 계산
         failure[current-1][1] = cnt / n
-        
+
     
     failure.sort(key=lambda x: (-x[1], x[0]))
     

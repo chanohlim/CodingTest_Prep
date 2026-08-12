@@ -12,12 +12,13 @@ from bisect import bisect_left
 n = int(input())
 a = list(map(int, input().split()))
 
+
 def LIS(n):
     dp = [1] * n
     for i in range(n):
         for j in range(i):
-            if a[j] > a[i]:
-                dp[i] = max(dp[i], dp[j] + 1)
+            if a[j] > a[i]: # 현재 원소(a[i])보다 앞에 존재하면서 조건을 만족하면(현재 원소보다 전투력이 높음)
+                dp[i] = max(dp[i], dp[j] + 1) # 갱신
 
     return n - max(dp)
 

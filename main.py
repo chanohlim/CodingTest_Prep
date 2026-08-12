@@ -1,20 +1,26 @@
 '''
 
-7
-15 11 4 8 5 2 4
+10
+12
 
-2
+4
+4
 
 '''
 
+a, b, c = 1, 1, 1
 n = int(input())
-arr = list(map(int, input().split()))
 
-dp = [1] * (n)
+ugly = [1] * n
 
-for i in range(n):
-    for j in range(i):
-        if arr[j] > arr[i]:
-            dp[i] = max(dp[i], dp[j] + 1)
+i2, i3, i5 = 2, 3, 5
+next_ugly = [i2, i3, i5]
 
-print(n - max(dp))
+for i in range(1, n):
+
+    ugly[n] = min(next_ugly)
+
+    if ugly[n] == 
+
+
+print(ugly)
