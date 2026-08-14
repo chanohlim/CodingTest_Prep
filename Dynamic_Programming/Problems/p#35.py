@@ -8,7 +8,7 @@ i2 = i3 = i5 = 0
 next2, next3, next5 = 2, 3, 5
 
 for l in range(1, n):
-
+    
     ugly[l] = min(next2, next3, next5)
 
     if ugly[l] == next2: # 이미 리스트에 있는 못생긴 수이면
@@ -22,5 +22,5 @@ for l in range(1, n):
     if ugly[l] == next5:
         i5 += 1
         next5 = ugly[i5] * 5
-
+    
 print(ugly[n-1])

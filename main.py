@@ -1,36 +1,31 @@
-'''
+str_a = input()
+str_b = input()
 
-10
-12
+n = len(str_a)
+m = len(str_b)
 
-4
-4
+# a -> b
 
-'''
+dp = [[0] * (m + 1) for i in range(n + 1)] # 공백 포함
 
-a, b, c = 1, 1, 1
-n = int(input())
+for i in range(1, m+1):
+    dp[0][i] = i
 
-ugly = [1] * n
+for i in range(1, n+1):
+    dp[i][0] = i
 
-i2, i3, i5 = 0, 0, 0
-next2, next3, next5 = 2, 3, 5
+for i in range(1, n+1):
+    for j in range(1, m+1):
+        if str_a[i-1] == str_b[j-1]:
+            dp[i][j] = dp[i-1][j-1]
 
-for i in range(1, n):
+        else:
+            dp[i][j] = min(
+                dp[i-1][j], # 삭제
+                dp[i][j-1], # 삽입
+                dp[i-1][j-1] # 교체
+            ) + 1
 
-    ugly[i] = min(next2, next3, next5)
+print(dp[n][m])
 
-    if ugly[i] == next2:
-        i2 += 1
-        next2 = ugly[i2] * 2
-
-    if ugly[i] == next3:
-        i3 += 1
-        next3 = ugly[i3] * 3
-
-    if ugly[i] == next5:
-        i5 += 1
-        next5 = ugly[i5] * 5
-
-
-print(ugly[n-1])
+print(dp)
