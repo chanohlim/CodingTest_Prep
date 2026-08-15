@@ -89,20 +89,15 @@ for i in distance_table:
 
 cnt = 0
 
-for i in range(1, N+1):
-    flag = [False] * (N + 1)
+for n in range(1, N+1):
+    possible = True
+    for i in range(1, N+1):
+        if min(graph[n][i], graph[i][n]) == INF:
+            possible = False
 
-    for j in range(1, N+1):
-        
-        if distance_table[i][j] != INF:
-            flag[j] = True
-
-        if distance_table[j][i] != INF:
-            flag[j] = True
-
-    if all(flag[1:]) == True:
+    if possible:
         cnt += 1
-        print(i)
+
 
 print(cnt)
 

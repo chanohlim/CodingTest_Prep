@@ -24,12 +24,10 @@
 7 4 10 6 0
 
 '''
-import sys
+from sys import stdin
+from print_graph import print_graph
 
-sys.path.append('/workspaces/CodingTest_Prep')
-from utils.print_graph import print_graph
-
-input = sys.stdin.readline
+input = stdin.readline
 
 INF = int(1e9)
 
