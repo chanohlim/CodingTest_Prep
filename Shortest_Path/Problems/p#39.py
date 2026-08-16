@@ -26,88 +26,34 @@
 
 '''
 
+import heapq as h
+from print_graph import print_graph
 
-import heapq
+INF = int(1e9)
 
 T = int(input())
 
-def print_graph(arr):
-    for i in arr:
-        for j in i:
-            print(j, end = ' ')
-        print()
+movement = [(0, 1), (0, -1), (1, 0), (-1, 0)]
 
-def mars_1(N):
 
-    INF = int(1e9)
+def Dijkstra(N):
 
-    mars_map = []
-    graph = [[] for i in range(N * N)]
+    graph = []
 
     for i in range(N):
-        mars_map.append(list(map(int, input().split())))
+        graph.append(list(map(int, input().split())))
 
-    distance = [INF] * (N * N)
-    movement = [(-1, 0), (1, 0), (0, -1), (0, 1)]
-
-    for i in range(N):
-        for j in range(N):
-
-            index = (i * N) + j
-
-            for k in range(4):
-                di, dj = i + movement[k][0], j + movement[k][1]
-
-                if 0 <= di < N and 0 <= dj < N:
-                    graph[index].append( ( index + ((di - i) * N + (dj - j)), mars_map[i][j] ) )
-
-
+    distance = [[INF] * N for i in range(N)]
+    
     pq = []
-    start = 0
-
-    heapq.heappush(pq, (0, start))
-    distance[start] = 0
+    h.heappush(pq, (graph[0][0], (0,0))) # cost, 좌표
+    distance[0][0] = graph[0][0]
 
     while pq:
-        dist, now = heapq.heappop(pq)
+        dist, now = h.heappop(pq)
+        i, j = now
 
-        if dist > distance[now]:
-            continue
-
-        for node, cost in graph[now]:
-
-            cost += dist
-            if cost < distance[node]:
-                distance[node] = cost
-                heapq.heappush(pq, (cost, node))
-
-    print(distance[N*N - 1] + mars_map[N-1][N-1])
-
-
-def mars_2(N):
-
-    INF = int(1e9)
-    
-    mars_map = []
-    distance = [[INF] * (N) for i in range(N)]
-    
-
-    for i in range(N):
-        mars_map.append(list(map(int, input().split())))
-    
-    movement = [(-1, 0), (1, 0), (0, -1), (0, 1)]
-
-    pq = []
-
-    heapq.heappush(pq, (mars_map[0][0], (0,0))) # cost, (i, j)
-    distance[0][0] = mars_map[0][0]
-
-    while pq:
-
-        dist, coor = heapq.heappop(pq)
-        i, j = coor
-
-        if dist > distance[i][j]: # 어차피 더 작을 수가 없으니 스킵 => 오래된 데이터이다, 이미 최단거리가 확정된 노드임(pop된 순간 최단거리로 확정)
+        if dist > distance[i][j]: # 현재 꺼낸 경로가 이미 더 짧은 최단경로로 갱신이 된 경우 => 굳이 안봐도 됨
             continue
 
         for k in range(4):
@@ -116,16 +62,16 @@ def mars_2(N):
             if di < 0 or di >= N or dj < 0 or dj >= N:
                 continue
 
-            cost = dist + mars_map[di][dj]
+            cost = dist + graph[di][dj]
 
-            if cost < distance[di][dj]:
+            if cost < distance[di][dj]: # 더 좋은 경로를 발견하면 해당 노드까지의 최단거리를 갱신하고, 새로운 정보를 다시 탐색한다.
                 distance[di][dj] = cost
-                heapq.heappush(pq, (cost, (di, dj)))
+                h.heappush(pq, (cost, (di, dj)))
 
+    print_graph(distance)
     print(distance[N-1][N-1])
 
-            
+for t in range(T):
 
-for i in range(T):
-    n = int(input())
-    mars_2(n)
+    N = int(input())
+    Dijkstra(N)

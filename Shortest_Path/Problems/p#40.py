@@ -11,60 +11,42 @@
 
 '''
 
+from sys import stdin
+from utils.print_graph import print_graph
 from collections import deque
 
-INF = int(1e9)
-
+input = stdin.readline
 N, M = map(int, input().split())
 
-graph = [[] for i in range(N + 1)]
+INF = int(1e9)
 distance = [INF] * (N + 1)
+visited = [False] * (N + 1)
+
+graph = [[] for i in range(N + 1)]
 
 for i in range(M):
     a, b = map(int, input().split())
     graph[a].append(b)
     graph[b].append(a)
 
-def bfs(start, N):
+def BFS(start):
 
-    q = deque()
-    q.append(start)
+    q = deque([start])
+    visited[start] = True
     distance[start] = 0
 
     while q:
         now = q.popleft()
+
         for node in graph[now]:
+            if not visited[node]:
+                visited[node] = True
+                distance[node] = distance[now] + 1
+                q.append(node)
 
-            if distance[node] != INF: # 이미 방문한 노드이므로 방문X
-                continue
+    max_dist = max(distance[1:])
+    candidates = [i for i in range(1, N+1) if distance[i] == max_dist]
 
-            distance[node] = distance[now] + 1
-            q.append(node)
+    print(candidates[0], max_dist, len(candidates))
 
-    max_val = 0
-    max_node = N
-    cnt = 0
-
-    for i in range(N, 0, -1):
-
-        if distance[i] > max_val:
-            max_val = distance[i]
-            max_node = i
-            cnt = 1
-
-        elif distance[i] == max_val:
-            max_node = i
-            cnt += 1
-
-    return max_node, max_val, cnt
-
-a, b, c = bfs(1, N)
-
-print(a, b, c)
-
-
-        
-
-        
-
-
+BFS(1)
