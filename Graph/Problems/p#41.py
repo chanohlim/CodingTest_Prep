@@ -14,22 +14,29 @@ YES
 
 N, M = map(int, input().split())
 
+graph = []
+
 root = [i for i in range(N + 1)]
-rank = [0 for i in range(N + 1)]
+rank = [1] * (N + 1)
 
-def find_root(node):
+for i in range(N):
+    graph.append(list(map(int, input().split())))
 
-    if root[node] != node:
-        root[node] = find_root(root[node])
-    
-    return root[node]
+def find_root(a):
 
-def union(a, b):
+    while root[a] != a:
+        root[a] = root[root[a]]
+        a = root[a]
+
+    return a
+
+
+def union_by_rank(a, b):
 
     root_a = find_root(a)
     root_b = find_root(b)
 
-    if root_a == root_b:
+    if root_a == root_b: # root가 같으면 union 연산 불필요
         return
 
     if rank[root_a] > rank[root_b]:
@@ -40,25 +47,21 @@ def union(a, b):
         root[root_b] = root_a
         rank[root_a] += 1
 
-for i in range(1, N+1):
-    arr = list(map(int, input().split()))
+
+for i in range(N):
     for j in range(N):
-        if arr[j] == 1:
-            union(i, j+1)
+        if graph[i][j] == 1:
+            union_by_rank(i+1, j+1)
+
 
 plan = list(map(int, input().split()))
-flag = True
+possible = True
 
 for i in range(M-1):
-    
-    a = plan[i]
-    b = plan[i + 1]
+    if find_root(plan[i]) != find_root(plan[i + 1]):
+        possible = False
 
-    if find_root(a) != find_root(b):
-        flag = False
-
-if flag:
+if possible:
     print("YES")
 else:
     print("NO")
-
