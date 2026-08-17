@@ -1,52 +1,83 @@
 '''
 
-6 7
-3 6
-4 3
-3 2
-1 3
-1 2
-2 4
-5 2
+3
+3
+5 5 4
+3 9 1
+3 2 7
+5
+3 7 2 0 1
+2 8 0 9 1
+1 2 1 8 1
+9 8 9 2 0
+3 6 5 1 5
+7
+9 0 5 1 1 5 3
+4 1 2 1 6 5 3
+0 7 6 1 6 8 5
+1 1 7 8 3 2 3
+9 4 0 7 6 4 1
+5 8 3 2 4 8 3
+7 4 8 4 8 3 4
+
+20
+19
+36
 
 '''
 
-from sys import stdin
+import heapq
 from utils.print_graph import print_graph
-from collections import deque
+from sys import stdin
 
 input = stdin.readline
-N, M = map(int, input().split())
-
 INF = int(1e9)
-distance = [INF] * (N + 1)
-visited = [False] * (N + 1)
 
-graph = [[] for i in range(N + 1)]
+dx = [1, -1, 0 ,0]
+dy = [0, 0, 1, -1]
 
-for i in range(M):
-    a, b = map(int, input().split())
-    graph[a].append(b)
-    graph[b].append(a)
 
-def BFS(start):
+def Dijkstra(N):
 
-    q = deque([start])
-    visited[start] = True
-    distance[start] = 0
+    graph = []
 
-    while q:
-        now = q.popleft()
+    for i in range(N):
+        graph.append(list(map(int, input().split())))
 
-        for node in graph[now]:
-            if not visited[node]:
-                visited[node] = True
-                distance[node] = distance[now] + 1
-                q.append(node)
+    distance = [[INF] * N for i in range(N)]
 
-    max_dist = max(distance[1:])
-    candidates = [i for i in range(1, N+1) if distance[i] == max_dist]
 
-    print(candidates[0], max_dist, len(candidates))
+    pq = []
+    heapq.heappush(pq, (graph[0][0], (0, 0)))
+    distance[0][0] = graph[0][0]
 
-BFS(1)
+    while pq:
+        dist, now = heapq.heappop(pq)
+        i, j = now
+
+        if dist > distance[i][j]:
+            continue
+
+        for k in range(4):
+            di, dj = i + dx[k], j + dy[k]
+
+            if di < 0 or di >= N or dj < 0 or dj >= N:
+                continue
+
+            cost = dist + graph[di][dj]
+            if cost < distance[di][dj]:
+                distance[di][dj] = cost
+                heapq.heappush(pq, (cost, (di, dj)))
+
+    print(distance[N-1][N-1])
+
+
+
+
+
+
+T = int(input())
+
+for t in range(T):
+    N = int(input())
+    Dijkstra(N)
