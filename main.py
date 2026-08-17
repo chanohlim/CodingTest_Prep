@@ -1,83 +1,67 @@
 '''
 
-3
-3
-5 5 4
-3 9 1
-3 2 7
-5
-3 7 2 0 1
-2 8 0 9 1
-1 2 1 8 1
-9 8 9 2 0
-3 6 5 1 5
-7
-9 0 5 1 1 5 3
-4 1 2 1 6 5 3
-0 7 6 1 6 8 5
-1 1 7 8 3 2 3
-9 4 0 7 6 4 1
-5 8 3 2 4 8 3
-7 4 8 4 8 3 4
+5 4
+0 1 0 1 1
+1 0 1 1 0
+0 1 0 0 0
+1 1 0 0 0
+1 0 0 0 0
+2 3 4 3
 
-20
-19
-36
+YES
 
 '''
 
-import heapq
-from utils.print_graph import print_graph
-from sys import stdin
+N, M = map(int, input().split())
 
-input = stdin.readline
-INF = int(1e9)
+graph = []
 
-dx = [1, -1, 0 ,0]
-dy = [0, 0, 1, -1]
+root = [i for i in range(N + 1)]
+rank = [1] * (N + 1)
 
+for i in range(N):
+    graph.append(list(map(int, input().split())))
 
-def Dijkstra(N):
+def find_root(a):
 
-    graph = []
+    while root[a] != a:
+        root[a] = root[root[a]]
+        a = root[a]
 
-    for i in range(N):
-        graph.append(list(map(int, input().split())))
-
-    distance = [[INF] * N for i in range(N)]
+    return a
 
 
-    pq = []
-    heapq.heappush(pq, (graph[0][0], (0, 0)))
-    distance[0][0] = graph[0][0]
+def union_by_rank(a, b):
 
-    while pq:
-        dist, now = heapq.heappop(pq)
-        i, j = now
+    root_a = find_root(a)
+    root_b = find_root(b)
 
-        if dist > distance[i][j]:
-            continue
+    if root_a == root_b: # root가 같으면 union 연산 불필요
+        return
 
-        for k in range(4):
-            di, dj = i + dx[k], j + dy[k]
-
-            if di < 0 or di >= N or dj < 0 or dj >= N:
-                continue
-
-            cost = dist + graph[di][dj]
-            if cost < distance[di][dj]:
-                distance[di][dj] = cost
-                heapq.heappush(pq, (cost, (di, dj)))
-
-    print(distance[N-1][N-1])
+    if rank[root_a] > rank[root_b]:
+        root[root_b] = root_a
+    elif rank[root_a] < rank[root_b]:
+        root[root_a] = root_b
+    else:
+        root[root_b] = root_a
+        rank[root_a] += 1
 
 
+for i in range(N):
+    for j in range(N):
+        if graph[i][j] == 1:
+            union_by_rank(i+1, j+1)
 
 
+plan = list(map(int, input().split()))
+possible = True
 
+for i in range(M-1):
+    if find_root(plan[i]) != find_root(plan[i + 1]):
+        possible = False
 
-T = int(input())
-
-for t in range(T):
-    N = int(input())
-    Dijkstra(N)
+if possible:
+    print("YES")
+else:
+    print("NO")
