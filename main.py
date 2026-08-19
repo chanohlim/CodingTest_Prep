@@ -1,67 +1,70 @@
 '''
 
-5 4
-0 1 0 1 1
-1 0 1 1 0
-0 1 0 0 0
-1 1 0 0 0
-1 0 0 0 0
-2 3 4 3
+4
+3
+4
+1
+1
 
-YES
+2
+
+4
+6
+2
+2
+3
+3
+4
+4
+
+3
 
 '''
 
-N, M = map(int, input().split())
+from sys import stdin
+input = stdin.readline
 
-graph = []
+G = int(input())
+P = int(input())
 
-root = [i for i in range(N + 1)]
-rank = [1] * (N + 1)
-
-for i in range(N):
-    graph.append(list(map(int, input().split())))
-
-def find_root(a):
-
-    while root[a] != a:
-        root[a] = root[root[a]]
-        a = root[a]
-
-    return a
+root = [i for i in range(G + 1)]
 
 
-def union_by_rank(a, b):
+def find_root(x):
+
+    while root[x] != x:
+        root[x] = root[root[x]]
+        x = root[x]
+
+    return x
+
+def union(a, b):
 
     root_a = find_root(a)
     root_b = find_root(b)
 
-    if root_a == root_b: # root가 같으면 union 연산 불필요
+    if root_a == root_b:
         return
 
-    if rank[root_a] > rank[root_b]:
+    if root_a < root_b:
         root[root_b] = root_a
-    elif rank[root_a] < rank[root_b]:
-        root[root_a] = root_b
     else:
-        root[root_b] = root_a
-        rank[root_a] += 1
+        root[root_a] = root_b
+
+cnt = 0
+planes = []
+
+for i in range(P):
+    planes.append(int(input()))
 
 
-for i in range(N):
-    for j in range(N):
-        if graph[i][j] == 1:
-            union_by_rank(i+1, j+1)
+for p in planes:    
+    root_p = find_root(p)
 
+    if root_p == 0:
+        break
+    else:
+        union(root_p-1, root_p)
+        cnt += 1
 
-plan = list(map(int, input().split()))
-possible = True
-
-for i in range(M-1):
-    if find_root(plan[i]) != find_root(plan[i + 1]):
-        possible = False
-
-if possible:
-    print("YES")
-else:
-    print("NO")
+print(cnt)
