@@ -20,85 +20,48 @@
 3
 
 '''
-
 from sys import stdin
 input = stdin.readline
 
 G = int(input())
 P = int(input())
 
-root = [i for i in range(G + 1)]
-planes = []
+root = [i for i in range(G+1)]
 
+def find_root(x):
 
-def bruteforce():
-
-    gate = [0 for i in range(G + 1)]
-    airplanes = []
-
-    for i in range(P):
-        airplanes.append(int(input()))
-
-    result = 0
-
-    for airplane in airplanes:
-
-        cnt = 0
-
-        for i in range(airplane, 0, -1):
-            if gate[i] == 0:
-                gate[i] = 1
-                cnt += 1
-                break
-
-        if cnt == 0:
-            break
-
-        result += 1
-
-    return result
-
-def find_root(node):
-
-    while root[node] != node:
-
-        root[node] = root[root[node]]
-        node = root[node]
-
-    return root[node]
+    while root[x] != x:
+        root[x] = root[root[x]]
+        x = root[x]
+    
+    return x
 
 def union(a, b):
 
     root_a = find_root(a)
     root_b = find_root(b)
 
+    if root_a == root_b:
+        return
+
     if root_a < root_b:
         root[root_b] = root_a
     else:
         root[root_a] = root_b
 
+planes = []
+cnt = 0
 
+for i in range(P):
+    planes.append(int(input()))
 
-def main():
+for p in planes:
+    root_plane = find_root(p)
 
-    result = 0
+    if root_plane == 0:
+        break
+    else:
+        union(root_plane, root_plane - 1) # 도킹
+        cnt += 1
 
-    for i in range(P):
-        planes.append(int(input()))
-
-    for plane in planes:
-        available = find_root(plane)
-        
-        if available == 0:
-            break
-
-        union(available - 1, available)
-
-        result += 1
-
-    return result
-
-print(main())
-
-
-
+print(cnt)
