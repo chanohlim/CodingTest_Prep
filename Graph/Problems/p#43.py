@@ -15,53 +15,59 @@
 
 '''
 
+from sys import stdin
+input = stdin.readline
+
 N, M = map(int, input().split())
 
-root = [i for i in range(N)]
-rank = [0 for i in range(N)]
+road = []
 
-def find_root(node):
+root = [i for i in range(N + 1)]
+rank = [1 for i in range(N + 1)]
 
-    while root[node] != node:
-        root[node] = root[root[node]]
-        node = root[node]
+total = 0
+
+for i in range(M):
+    x, y, z = map(int, input().split())
+    road.append((x, y, z))
+    total += z
+
+road.sort(key=lambda x: x[2])
+
+def find_root(x):
+
+    while root[x] != x:
+        root[x] = root[root[x]]
+        x = root[x]
     
-    return root[node]
+    return x
 
-def union(a, b):
-    
+def union_by_rank(a, b):
     root_a = find_root(a)
     root_b = find_root(b)
 
-    if root_a == root_b: # 사이클 발생
+    if root_a == root_b:
         return False
+
     
-    if rank[root_a] > rank[root_b]:
-        root[root_b] = root_a
-    elif rank[root_a] < rank[root_b]:
+    if rank[root_a] < rank[root_b]:
         root[root_a] = root_b
+    elif rank[root_a] > rank[root_b]:
+        root[root_b] = root_a
     else:
         root[root_b] = root_a
         rank[root_a] += 1
 
     return True
 
-edges = []
 
-for i in range(M):
-    X, Y, Z = map(int, input().split())
-    edges.append((X, Y, Z))
-
-edges.sort(key = lambda x: x[2])
-
-result = 0
 cost = 0
 
-for edge in edges:
+for r in road:
+    x, y, z = r
+    possible = union_by_rank(x, y)
 
-    cost += edge[2]
+    if possible:
+        cost += z
 
-    if union(edge[0], edge[1]):
-        result += edge[2]
-
-print(cost - result)
+print(total - cost)
