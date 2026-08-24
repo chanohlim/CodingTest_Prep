@@ -13,63 +13,82 @@
 from sys import stdin
 input = stdin.readline
 
+
 N = int(input())
 
-root = [i for i in range(N)]
-rank = [0 for i in range(N)]
-coor = []
+root = [i for i in range(N+1)]
+rank = [1 for i in range(N+1)]
+
+data_x = []
+data_y = []
+data_z = []
+
+for i in range(N):
+    x, y, z = map(int, input().split())
+
+    data_x.append((x, i+1))
+    data_y.append((y, i+1))
+    data_z.append((z, i+1))
+
+
+data_x.sort()
+data_y.sort()
+data_z.sort()
+
 edges = []
 
-def find_root(node):
-    
-    while root[node] != node:
-        root[node] = root[root[node]]
-        node = root[node]
+for i in range(N - 1):
+    x1, a1 = data_x[i]
+    x2, a2 = data_x[i + 1]
 
-    return root[node]
+    y1, b1 = data_y[i]
+    y2, b2 = data_y[i + 1]
 
-def union(a, b):
+    z1, c1 = data_z[i]
+    z2, c2 = data_z[i + 1]
+
+    edges.append((a1, a2, x2-x1))
+    edges.append((b1, b2, y2-y1))
+    edges.append((c1, c2, z2-z1))
+
+edges.sort(key=lambda x:x[2])
+
+
+def find_root(x):
+
+    while root[x] != x:
+        root[x] = root[root[x]]
+        x = root[x]
+
+    return x
+
+
+def union_by_rank(a, b):
 
     root_a = find_root(a)
     root_b = find_root(b)
 
-    if root_a == root_b:
+    if root_a == root_b: # 사이클 발생
         return False
-    
+
     if rank[root_a] > rank[root_b]:
         root[root_b] = root_a
-
     elif rank[root_a] < rank[root_b]:
         root[root_a] = root_b
+
     else:
         root[root_b] = root_a
         rank[root_a] += 1
 
     return True
 
+total = 0
 
+for e in edges:
+    a, b, cost = e
 
-for i in range(N):
-    X, Y, Z = map(int, input().split())
-    coor.append((X, Y, Z, i))
+    possible = union_by_rank(a, b)
+    if possible:
+        total += cost
 
-def cost(a, b, i):
-    return abs(a[i] - b[i])
-
-
-
-for i in range(3):
-    coor.sort(key=lambda x: x[i])
-    
-    for j in range(N-1):
-        edges.append((cost(coor[j], coor[j+1], i), coor[j][3], coor[j+1][3]))
-
-edges.sort(key=lambda x: x[0])
-
-result = 0
-
-for edge in edges:
-    if union(edge[1], edge[2]):
-        result += edge[0]
-
-print(result)
+print(total)
