@@ -1,94 +1,101 @@
 '''
 
+3
 5
-11 -15 -15
-14 -5 -15
--1 -1 -5
-10 -4 -1
-19 -4 19
-
+5 4 3 2 1
+2
+2 4
+3 4
+3
+2 3 1
+0
 4
+1 2 3 4
+3
+1 2
+3 4
+2 3
+
+5 3 2 4 1
+2 3 1
+IMPOSSIBLE
 
 '''
 from sys import stdin
 input = stdin.readline
 
-
-N = int(input())
-
-root = [i for i in range(N+1)]
-rank = [1 for i in range(N+1)]
-
-data_x = []
-data_y = []
-data_z = []
-
-for i in range(N):
-    x, y, z = map(int, input().split())
-
-    data_x.append((x, i+1))
-    data_y.append((y, i+1))
-    data_z.append((z, i+1))
+from collections import deque
 
 
-data_x.sort()
-data_y.sort()
-data_z.sort()
+def topology(N, graph, indegree):
 
-edges = []
+    q = deque()
+    for i in range(1, len(indegree)):
+        if indegree[i] == 0:
+            q.append(i)
 
-for i in range(N - 1):
-    x1, a1 = data_x[i]
-    x2, a2 = data_x[i + 1]
+    result = []
 
-    y1, b1 = data_y[i]
-    y2, b2 = data_y[i + 1]
+    while q:
+        now = q.popleft()
+        result.append(now)
 
-    z1, c1 = data_z[i]
-    z2, c2 = data_z[i + 1]
+        for node in graph[now]:
 
-    edges.append((a1, a2, x2-x1))
-    edges.append((b1, b2, y2-y1))
-    edges.append((c1, c2, z2-z1))
+            indegree[node] -= 1
 
-edges.sort(key=lambda x:x[2])
+            if indegree[node] == 0:
+                q.append(node)
+
+        if len(q) > 1: # indegree가 0이 되는게 여러개면 순서가 불분명하므로 '?' 반환 => now를 pop했으니, 원소의 개수가 2 이상이면 순서가 불분명하다.
+            return '?'
+        
+
+    if len(result) != N: # 사이클 발생했으므로, 데이터에 일관성이 없다
+        return 'IMPOSSIBLE'
+
+    answer = ''
+    for i in result:
+        answer += str(i)
+        answer += ' '
+        
+
+    return answer
 
 
-def find_root(x):
 
-    while root[x] != x:
-        root[x] = root[root[x]]
-        x = root[x]
+T = int(input())
 
-    return x
+for t in range(T):
+
+    n = int(input())
+
+    graph = [[] for i in range(n + 1)]
+    indegree = [0] * (n + 1)
+
+    rank = list(map(int, input().split()))
+    for i in range(n):
+        for j in range(i+1, n):
+            graph[rank[i]].append(rank[j])
+            indegree[rank[j]] += 1
 
 
-def union_by_rank(a, b):
+    m = int(input())
+    for i in range(m):
+        a, b = map(int, input().split())
+        if a in graph[b]: # 원래 b가 a보다 등수가 높았으면
+            graph[b].remove(a)
+            graph[a].append(b)
+            indegree[a] -= 1
+            indegree[b] += 1
+        else:
+            graph[a].remove(b)
+            graph[b].append(a)
+            indegree[a] += 1
+            indegree[b] -= 1
 
-    root_a = find_root(a)
-    root_b = find_root(b)
 
-    if root_a == root_b: # 사이클 발생
-        return False
+    result = topology(n, graph, indegree)
+    print(result)
 
-    if rank[root_a] > rank[root_b]:
-        root[root_b] = root_a
-    elif rank[root_a] < rank[root_b]:
-        root[root_a] = root_b
-
-    else:
-        root[root_b] = root_a
-        rank[root_a] += 1
-
-    return True
-
-total = 0
-
-for e in edges:
-    a, b, cost = e
-
-    possible = union_by_rank(a, b)
-    if possible:
-        total += cost
-
-print(total)
+    
