@@ -53,17 +53,16 @@
 39
 
 '''
-from collections import deque
-from copy import deepcopy
+
 from sys import stdin
 input = stdin.readline
 
+from utils.print_graph import print_graph
+
+from collections import deque
 
 N = int(input())
 graph = []
-fish_cnt = 0
-time = 0
-size = 2
 
 for i in range(N):
     graph.append(list(map(int, input().split())))
@@ -71,77 +70,81 @@ for i in range(N):
 for i in range(N):
     for j in range(N):
         if graph[i][j] == 9:
-            start = (i,j)
+            now = (i, j)
 
+size = 2
+eat_cnt = 0
 
-movement = [(-1, 0), (1, 0), (0, -1), (0, 1)] # 위 아래 좌 우
+dx = [0, 0, 1, -1]
+dy = [1, -1, 0, 0]
 
-def print_graph(arr):
-    for i in arr:
-        for j in i:
-            print(j, end = ' ')
-        print()
-
-def find_target(ocean, start, size, fish_cnt, time):
+def bfs(start, visited, size, N):
 
     q = deque()
-    prey = []
-    min_dist = N*N
-    q.append(start)
+
+    i, j = start
+    distance = 0
+
+    q.append((distance, i, j))
+    visited[i][j] = True
+
+    possible = []
+    
 
     while q:
-
-        i, j = q.popleft()    
+        distance, i, j = q.popleft()
 
         for k in range(4):
-            di, dj = i + movement[k][0], j + movement[k][1]
+            di, dj = i + dx[k], j + dy[k]
 
             if di >= N or di < 0 or dj >= N or dj < 0:
                 continue
 
-            if ocean[di][dj] == 0 or ocean[di][dj] == size: # 지나갈 수 있는 경로이면
-                ocean[di][dj] = ocean[i][j] + 10
-                q.append((di, dj))
-
-            elif 0 < ocean[di][dj] < size: # 먹을 수 있는 물고기이면
-                dist = ocean[i][j]//10 + 1
-
-                if dist == min_dist:
-                    prey.append((di, dj, dist)) # 좌표와 거리
-                elif dist < min_dist:
-                    min_dist = dist
-                    prey = [(di, dj, dist)]
-            else:
+            if visited[di][dj]: # 상어 자신이 있었던 칸이면 skip
                 continue
 
-    if len(prey) != 0:
-        prey.sort(key=lambda x: (x[0], x[1]))
-        fish_cnt += 1
-        time += prey[0][2]
-        return (prey[0][0], prey[0][1], fish_cnt, time)
+            if graph[di][dj] == 0: # 빈칸일 때
+                visited[di][dj] = True # 방문 처리
+                q.append((distance + 1, di, dj))
+            elif 1 <= graph[di][dj] <= 6: # 다른 물고기가 있을 때
+                if graph[di][dj] > size: # 만약 자신보다 크기가 크면 skip
+                    continue
+                elif graph[di][dj] == size: # 같으면 지나갈 수 있음
+                    visited[di][dj] = True
+                    q.append((distance + 1, di, dj))
+                else: # 자신보다 작으면
+                    possible.append((distance + 1, di,dj)) # 먹을 수 있는 후보로 추가
 
 
-    return (False, False, fish_cnt, time)
-            
+    return possible
 
-for i in range(N*N):
+
+visited = [[False] * N for i in range(N)]
+possible = bfs(now, visited, size, N)
+
+time = 0
+
+while possible:
+    possible.sort(key=lambda x: (x[0], x[1], x[2]))
+
+    prev_i, prev_j = now
+    distance, i, j = possible[0]
+
+    eat_cnt += 1
+    if eat_cnt == size:
+        size += 1
+        eat_cnt = 0
 
     
+    graph[i][j] = 9
+    now = (i, j)
+    graph[prev_i][prev_j] = 0
 
-    ocean = deepcopy(graph)
-    graph[start[0]][start[1]] = 0
+    time += distance
 
-    x, y, fish_cnt, time = find_target(ocean, start, size, fish_cnt, time)
+    visited = [[False] * N for i in range(N)]
 
-    if fish_cnt == size:
-        if size < 7:
-            size += 1
-            fish_cnt = 0
+    possible = bfs(now, visited, size, N)
 
-    if x is False:
-        break
-    
-    graph[x][y] = 9
-    start = (x, y)
 
 print(time)
