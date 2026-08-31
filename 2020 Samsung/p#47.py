@@ -30,165 +30,138 @@
 
 '''
 
-graph = [[] for i in range(4)]
-directions = [0] * (17) # 1:북 - 2:북서 - 3:서 - 4:남서 - 5:남 - 6:남동 - 7:동 - 8:북동
+from sys import stdin
+input = stdin.readline
 
-movement = [(0, 0), (-1, 0), (-1, -1), (0, -1), (1, -1), (1, 0), (1, 1), (0, 1), (-1, 1)]
+from copy import deepcopy
+
+
+graph = [[] for i in range(4)]
+fish_direction = [0] * 17
 
 result = 0
 
+direction = [(0, 0), (-1, 0), (-1, -1), (0, -1), (1, -1), (1, 0), (1, 1), (0, 1), (-1, 1)]
+
 for i in range(4):
-    temp = list(map(int, input().split()))
-    for j in range(0, 8, 2):
-        graph[i].append(temp[j])
-        directions[temp[j]] = temp[j + 1]
+    data = list(map(int, input().split()))
+    for j in range(4):
+        fish = data[2*j]
+        fish_direction[fish] = data[2*j + 1]
+        graph[i].append(fish)
 
 
-def print_graph(arr):
-    for i in arr:
-        for j in i:
-            print("%2d" % j, end = ' ')
-        print()
+class Shark:
 
-def rotate(fish, directions):
-
-    if directions[fish] == 8:
-        directions[fish] = 1
-    else:
-        directions[fish] += 1
+    def __init__(self, x, y, d):
+        self.x = x
+        self.y = y
+        self.d = d
 
 
-def moveable(fish, i, j, directions, graph):
 
-    di, dj = i + movement[directions[fish]][0], j + movement[directions[fish]][1]
+def movement(shark, graph, fish_direction):
 
-    if di < 0 or di >= 4 or dj < 0 or dj >= 4: # 이동하려는 칸이 공간의 경계를 넘는 칸이면
-        return False
-    
-    if graph[di][dj] == 0: # 이동하려는 칸에 상어가 있으면
-        return False
+    shark_x, shark_y = shark.x, shark.y
 
-    return True
-
-def find_prey(i, j, directions, graph):
-
-    prey = []
-    shark_direction = directions[0]
-
-    x = 1
-
-
-    di, dj = i + movement[shark_direction][0] * x, j + movement[shark_direction][1] * x
-    
-    while 0 <= di < 4 and 0 <= dj < 4:
-
-        
-        if graph[di][dj] != -1:
-            prey.append(graph[di][dj])
-        
-        x += 1
-        di, dj = i + movement[shark_direction][0] * x, j + movement[shark_direction][1] * x
-        
-
-    return prey
-
-def fish_move(directions, graph):
     for fish in range(1, 17):
 
-        move = True
-        
-        if directions[fish] == 0: # 이미 먹혔으면
+        d = fish_direction[fish]
+
+        if d == 0:
             continue
 
         for i in range(4):
             for j in range(4):
                 if graph[i][j] == fish:
-                    coor = (i, j)
+                    x, y = i, j
+                    break
 
-        x, y = coor
 
-        current_d = directions[fish]
-        while not moveable(fish, x, y, directions, graph):
+        possible = False
+
+        for i in range(8):
+            dx, dy = x + direction[d][0], y + direction[d][1]
             
-            rotate(fish, directions)
-            if current_d == directions[fish]:
-                move = False
+            if (dx < 0 or dx >= 4 or dy < 0 or dy >= 4) or (dx == shark_x and dy == shark_y):
+                d = d % 8 + 1
+                continue
 
+            possible = True
+            break
 
-        if move:
-            dx, dy = x + movement[directions[fish]][0], y + movement[directions[fish]][1]
+        if possible:
+            fish_direction[fish] = d
             graph[dx][dy], graph[x][y] = graph[x][y], graph[dx][dy]
 
+def possible_prey(shark, graph):
 
-def prey_location(fish, graph):
+    x, y, d = shark.x, shark.y, shark.d
+    possible = []
 
-    for i in range(4):
-        for j in range(4):
-            if graph[i][j] == fish:
-                return (i, j)
+    for i in range(1, 4):
+        dx, dy = x + (direction[d][0] * i), y + (direction[d][1] * i)
+
+        if (dx < 0 or dx >= 4 or dy < 0 or dy >= 4) or (graph[dx][dy] == 0):
+            continue
+
+        possible.append((dx, dy))
+
+    return possible
 
 
-def backtracking(prey, food, graph, directions):
+def hunt(shark, prey_coor, graph, fish_direction):
 
+    dx, dy = prey_coor
+
+    prey = graph[dx][dy]
+
+    shark.d = fish_direction[prey] # 상어가 물고기의 방향 습득
+    fish_direction[prey] = 0 # 물고기 죽음
+
+    graph[dx][dy] = 0 # 빈 칸 처리
+    shark.x, shark.y = dx, dy # 상어의 위치 업데이트
+
+
+def backtracking(shark, size, graph, fish_direction):
     global result
 
-    if not prey: # 더 이상 먹을 prey가 없으면 => 상어가 집을 가야되면
-        result = max(result, food)
+    possible = possible_prey(shark, graph)
+
+    if not possible:
+        result = max(result, size)
         return
 
-    
-    for i in range(len(prey)): # prey의 개수 만큼 반복
+    for p in possible:
 
-        
-        x, y = prey_location(prey[i], graph)
-        food += graph[x][y]
-        direction_copy = directions[:]
-        map_copy = [row[:] for row in graph]
-        prey_copy = shark(x, y, map_copy, direction_copy)
-        backtracking(prey_copy, food, map_copy, direction_copy)
-        food -= graph[x][y]
-        
+        shark_x, shark_y, shark_d = shark.x, shark.y, shark.d
+        prey = graph[p[0]][p[1]]
 
+        graph_copy = deepcopy(graph)
+        fish_d_copy = deepcopy(fish_direction)
 
-def shark(x, y, graph, directions): # prey의 위치가 주어지면, 그 위치로 상어가 이동해서 prey를 먹고, 그다음에 물고기가 이동을 한 다음에 상어가 먹을 수 있는 prey를 반환하는 함수
+        hunt(shark, p, graph_copy, fish_d_copy)
 
-    prev_x, prev_y = prey_location(0, graph) # 상어 현재 위치
+        movement(shark, graph_copy, fish_d_copy)
 
-    directions[0] = directions[graph[x][y]] # 상어에게 먹힌 물고기의 방향 부여
+        backtracking(shark, size + prey, graph_copy, fish_d_copy)
 
-    directions[graph[x][y]] = 0 # 먹힌 물고기 표시
-
-    print()
-    print_graph(graph)
-    print()
-
-    graph[x][y] = 0 # 상어 이동
-    graph[prev_x][prev_y] = -1 # 빈 공간
-
-    fish_move(directions, graph)
-
-    print()
-    print_graph(graph)
-    print()
-
-    prey = find_prey(x, y, directions, graph)
-    if not prey:
-        return False
-
-    return prey
+        shark.x, shark.y, shark.d = shark_x, shark_y, shark_d
 
 
-# initialize
-result += graph[0][0]
-directions[0] = directions[graph[0][0]] # 상어에게 먹은 물고기의 방향을 부여
-directions[graph[0][0]] = 0 # 먹힌 물고기 표시
+
+
+
+
+
+#init
+init_prey = graph[0][0]
+shark = Shark(0, 0, fish_direction[init_prey])
 graph[0][0] = 0
-fish_move(directions, graph)
-prey = find_prey(0, 0, directions, graph)
+fish_direction[init_prey] = 0
 
+movement(shark, graph, fish_direction)
 
-backtracking(prey, result, graph, directions)
+backtracking(shark, init_prey, graph, fish_direction)
 
 print(result)
-
-
