@@ -1,167 +1,239 @@
 '''
 
-7 6 2 3 15 6 9 8
-3 1 1 8 14 7 10 1
-6 1 13 6 4 3 11 4
-16 1 8 7 5 2 12 2
+5 4 4
+0 0 0 0 3
+0 2 0 0 0
+1 0 0 0 4
+0 0 0 0 0
+0 0 0 0 0
+4 4 3 1
+2 3 1 4
+4 1 2 3
+3 4 2 1
+4 3 1 2
+2 4 3 1
+2 1 3 4
+3 4 1 2
+4 1 2 3
+4 3 2 1
+1 4 3 2
+1 3 2 4
+3 2 1 4
+3 4 1 2
+3 2 4 1
+1 4 2 3
+1 4 2 3
 
-33
+14
 
-16 7 1 4 4 3 12 8
-14 7 7 6 3 4 10 2
-5 2 15 2 8 3 6 4
-11 8 2 4 13 5 9 4
+4 2 6
+1 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 2
+4 3
+1 2 3 4
+2 3 4 1
+3 4 1 2
+4 1 2 3
+1 2 3 4
+2 3 4 1
+3 4 1 2
+4 1 2 3
 
-43
+26
 
-12 6 14 5 4 5 6 7
-15 1 11 7 3 7 7 5
-10 3 8 3 16 6 1 1
-5 8 2 7 13 6 9 2
+5 4 1
+0 0 0 0 3
+0 2 0 0 0
+1 0 0 0 4
+0 0 0 0 0
+0 0 0 0 0
+4 4 3 1
+2 3 1 4
+4 1 2 3
+3 4 2 1
+4 3 1 2
+2 4 3 1
+2 1 3 4
+3 4 1 2
+4 1 2 3
+4 3 2 1
+1 4 3 2
+1 3 2 4
+3 2 1 4
+3 4 1 2
+3 2 4 1
+1 4 2 3
+1 4 2 3
 
-76
+-1
 
-2 6 10 8 6 7 9 4
-1 7 16 6 4 2 5 8
-3 7 8 6 7 6 14 8
-12 7 15 4 11 3 13 3
+5 4 10
+0 0 0 0 3
+0 0 0 0 0
+1 2 0 0 0
+0 0 0 0 4
+0 0 0 0 0
+4 4 3 1
+2 3 1 4
+4 1 2 3
+3 4 2 1
+4 3 1 2
+2 4 3 1
+2 1 3 4
+3 4 1 2
+4 1 2 3
+4 3 2 1
+1 4 3 2
+1 3 2 4
+3 2 1 4
+3 4 1 2
+3 2 4 1
+1 4 2 3
+1 4 2 3
 
-39
+-1
 
 '''
 
 from sys import stdin
 input = stdin.readline
 
-from copy import deepcopy
+#from utils.print_graph import print_graph
 
-
-graph = [[] for i in range(4)]
-fish_direction = [0] * 17
-
-result = 0
-
-direction = [(0, 0), (-1, 0), (-1, -1), (0, -1), (1, -1), (1, 0), (1, 1), (0, 1), (-1, 1)]
-
-for i in range(4):
-    data = list(map(int, input().split()))
-    for j in range(4):
-        fish = data[2*j]
-        fish_direction[fish] = data[2*j + 1]
-        graph[i].append(fish)
-
+N, M, k = map(int, input().split())
 
 class Shark:
 
-    def __init__(self, x, y, d):
+    def __init__(self, n, x, y, d):
+        self.n = n
         self.x = x
         self.y = y
         self.d = d
 
+shark_graph = []
+smell_graph = [ [ [0,0] for i in range(N) ] for j in range(N)]
+sharks = []
+
+# 상 하 좌 우
+x_movement = [-1, 1, 0, 0]
+y_movement = [0, 0, -1, 1]
+
+shark_priority = [[] for i in range(M)] # shark_priority[0][0] => shark #1 의 윗 방향일때 우선순위 => 불변이므로 따로 클래스로 상태 관리 불필요
+
+for i in range(N):
+    shark_graph.append(list(map(int, input().split())))
+
+init_d = list(map(int, input().split()))
+
+for shark in range(1, M+1):
+
+    for x in range(N):
+        for y in range(N):
+            if shark_graph[x][y] == shark:
+                sharks.append(Shark(shark, x, y, init_d[shark-1]))
 
 
-def movement(shark, graph, fish_direction):
+for i in range(M):
+    for j in range(4):
+        shark_priority[i].append(list(map(int, input().split())))
 
-    shark_x, shark_y = shark.x, shark.y
 
-    for fish in range(1, 17):
+def move(N):
 
-        d = fish_direction[fish]
+    for shark in sharks:
 
-        if d == 0:
+        n, x, y, d = shark.n, shark.x, shark.y, shark.d
+
+        if n == 0: # 퇴출된 상어 무시
             continue
 
-        for i in range(4):
-            for j in range(4):
-                if graph[i][j] == fish:
-                    x, y = i, j
-                    break
+        possible = []
+        
+        for dir in shark_priority[n-1][d-1]:
+            dx, dy = x + x_movement[dir-1], y + y_movement[dir-1]
 
-
-        possible = False
-
-        for i in range(8):
-            dx, dy = x + direction[d][0], y + direction[d][1]
-            
-            if (dx < 0 or dx >= 4 or dy < 0 or dy >= 4) or (dx == shark_x and dy == shark_y):
-                d = d % 8 + 1
+            if dx < 0 or dx >= N or dy < 0 or dy >= N:
                 continue
 
-            possible = True
-            break
+            if smell_graph[dx][dy] != [0, 0]:
+                continue
 
-        if possible:
-            fish_direction[fish] = d
-            graph[dx][dy], graph[x][y] = graph[x][y], graph[dx][dy]
+            possible.append((dir, dx, dy))
 
-def possible_prey(shark, graph):
+        if possible: # 만약 갈 수 있는 빈 칸이 존재한다면
+            d, dx, dy = possible[0]
+            shark_graph[x][y] = 0
 
-    x, y, d = shark.x, shark.y, shark.d
-    possible = []
+            if shark_graph[dx][dy] != 0:
+                shark.n = 0 # 퇴출 처리
+                continue
 
-    for i in range(1, 4):
-        dx, dy = x + (direction[d][0] * i), y + (direction[d][1] * i)
-
-        if (dx < 0 or dx >= 4 or dy < 0 or dy >= 4) or (graph[dx][dy] == 0):
-            continue
-
-        possible.append((dx, dy))
-
-    return possible
+            shark_graph[dx][dy] = n
+            shark.x, shark.y, shark.d = dx, dy, d
 
 
-def hunt(shark, prey_coor, graph, fish_direction):
+        if not possible: # 만약 갈 수 있는 빈 칸이 존재하지 않는다면
 
-    dx, dy = prey_coor
+            for dir in shark_priority[n-1][d-1]:
+                dx, dy = x + x_movement[dir-1], y + y_movement[dir-1]
+    
+                if dx < 0 or dx >= N or dy < 0 or dy >= N:
+                    continue
+    
+                if smell_graph[dx][dy][0] == n:
+                    break
 
-    prey = graph[dx][dy]
+            shark_graph[x][y] = 0
+            shark_graph[dx][dy] = n
+            shark.x, shark.y, shark.d = dx, dy, dir
 
-    shark.d = fish_direction[prey] # 상어가 물고기의 방향 습득
-    fish_direction[prey] = 0 # 물고기 죽음
+        
 
-    graph[dx][dy] = 0 # 빈 칸 처리
-    shark.x, shark.y = dx, dy # 상어의 위치 업데이트
+    for i in range(N):
+        for j in range(N):
 
+            if smell_graph[i][j] != [0, 0]:
 
-def backtracking(shark, size, graph, fish_direction):
-    global result
+                smell_graph[i][j][1] -= 1
 
-    possible = possible_prey(shark, graph)
+                if smell_graph[i][j][1] == 0:
+                    smell_graph[i][j] = [0,0]
 
-    if not possible:
-        result = max(result, size)
-        return
-
-    for p in possible:
-
-        shark_x, shark_y, shark_d = shark.x, shark.y, shark.d
-        prey = graph[p[0]][p[1]]
-
-        graph_copy = deepcopy(graph)
-        fish_d_copy = deepcopy(fish_direction)
-
-        hunt(shark, p, graph_copy, fish_d_copy)
-
-        movement(shark, graph_copy, fish_d_copy)
-
-        backtracking(shark, size + prey, graph_copy, fish_d_copy)
-
-        shark.x, shark.y, shark.d = shark_x, shark_y, shark_d
-
-
-
-
-
-
+    for shark in sharks:
+            n, x, y, d = shark.n, shark.x, shark.y, shark.d
+            if n != 0:
+                smell_graph[x][y] = [n, k]
+        
 
 #init
-init_prey = graph[0][0]
-shark = Shark(0, 0, fish_direction[init_prey])
-graph[0][0] = 0
-fish_direction[init_prey] = 0
+for shark in sharks:
+    n, x, y, d = shark.n, shark.x, shark.y, shark.d
+    smell_graph[x][y] = [n, k]
 
-movement(shark, graph, fish_direction)
+time = 0
 
-backtracking(shark, init_prey, graph, fish_direction)
 
-print(result)
+while True:
+
+    if time == 1000:
+        time = -2
+        break
+
+
+    move(N)
+
+    alive_cnt = 0
+
+    for shark in sharks:
+        n = shark.n
+        if n != 0:
+            alive_cnt += 1
+
+    if alive_cnt == 1:
+        break
+
+    time += 1
+
+print(time + 1)
