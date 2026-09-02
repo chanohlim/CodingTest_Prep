@@ -33,23 +33,15 @@
 from sys import stdin
 input = stdin.readline
 
+from utils.print_graph import print_graph
 from copy import deepcopy
 
+direction_x = [0, -1, -1, 0, 1, 1, 1, 0, -1]
+direction_y = [0, 0, -1, -1, -1, 0, 1, 1, 1]
 
-graph = [[] for i in range(4)]
-fish_direction = [0] * 17
+fish_d = [0] * 17
 
 result = 0
-
-direction = [(0, 0), (-1, 0), (-1, -1), (0, -1), (1, -1), (1, 0), (1, 1), (0, 1), (-1, 1)]
-
-for i in range(4):
-    data = list(map(int, input().split()))
-    for j in range(4):
-        fish = data[2*j]
-        fish_direction[fish] = data[2*j + 1]
-        graph[i].append(fish)
-
 
 class Shark:
 
@@ -59,16 +51,23 @@ class Shark:
         self.d = d
 
 
+graph = [[] for i in range(4)]
 
-def movement(shark, graph, fish_direction):
+for i in range(4):
+    data = list(map(int, input().split()))
+    for j in range(4):
+        n = data[2*j] # 물고기의 번호
+        graph[i].append(n)
+        fish_d[n] = data[2*j + 1]
+
+
+def movement(shark, graph, fish_d):
 
     shark_x, shark_y = shark.x, shark.y
 
     for fish in range(1, 17):
 
-        d = fish_direction[fish]
-
-        if d == 0:
+        if fish_d[fish] == 0: # 죽은 물고기는 패스
             continue
 
         for i in range(4):
@@ -77,22 +76,23 @@ def movement(shark, graph, fish_direction):
                     x, y = i, j
                     break
 
-
-        possible = False
+        d = fish_d[fish]
 
         for i in range(8):
-            dx, dy = x + direction[d][0], y + direction[d][1]
-            
-            if (dx < 0 or dx >= 4 or dy < 0 or dy >= 4) or (dx == shark_x and dy == shark_y):
-                d = d % 8 + 1
+
+            dx, dy = x + direction_x[d], y + direction_y[d]
+
+            if (dx < 0 or dx >= 4 or dy < 0 or dy >= 4) or (shark_x == dx and shark_y == dy):
+                d = (d % 8) + 1
                 continue
 
             possible = True
             break
 
         if possible:
-            fish_direction[fish] = d
+            fish_d[fish] = d
             graph[dx][dy], graph[x][y] = graph[x][y], graph[dx][dy]
+
 
 def possible_prey(shark, graph):
 
@@ -100,7 +100,7 @@ def possible_prey(shark, graph):
     possible = []
 
     for i in range(1, 4):
-        dx, dy = x + (direction[d][0] * i), y + (direction[d][1] * i)
+        dx, dy = x + direction_x[d]*i, y + direction_y[d]*i
 
         if (dx < 0 or dx >= 4 or dy < 0 or dy >= 4) or (graph[dx][dy] == 0):
             continue
@@ -110,58 +110,59 @@ def possible_prey(shark, graph):
     return possible
 
 
-def hunt(shark, prey_coor, graph, fish_direction):
+def hunt(shark, prey, graph, fish_d): # 상어가 물고기가 있는 좌표로 이동 후 물고기를 먹기
 
-    dx, dy = prey_coor
+    x, y = shark.x, shark.y
+    dx, dy = prey
+    fish = graph[dx][dy]
 
-    prey = graph[dx][dy]
+    shark.d = fish_d[fish]
+    shark.x, shark.y = dx, dy
 
-    shark.d = fish_direction[prey] # 상어가 물고기의 방향 습득
-    fish_direction[prey] = 0 # 물고기 죽음
+    graph[dx][dy] = 0
+    fish_d[fish] = 0 # 죽음 처리
 
-    graph[dx][dy] = 0 # 빈 칸 처리
-    shark.x, shark.y = dx, dy # 상어의 위치 업데이트
+    return fish
 
 
-def backtracking(shark, size, graph, fish_direction):
+def backtracking(shark, total, graph, fish_d):
+
     global result
 
     possible = possible_prey(shark, graph)
 
     if not possible:
-        result = max(result, size)
+        result = max(result, total)
         return
 
     for p in possible:
 
-        shark_x, shark_y, shark_d = shark.x, shark.y, shark.d
-        prey = graph[p[0]][p[1]]
-
         graph_copy = deepcopy(graph)
-        fish_d_copy = deepcopy(fish_direction)
+        fish_d_copy = deepcopy(fish_d)
 
-        hunt(shark, p, graph_copy, fish_d_copy)
+        x, y, d = shark.x, shark.y, shark.d
 
+        prey = hunt(shark, p, graph_copy, fish_d_copy)
         movement(shark, graph_copy, fish_d_copy)
 
-        backtracking(shark, size + prey, graph_copy, fish_d_copy)
+        backtracking(shark, total + prey, graph_copy, fish_d_copy)
 
-        shark.x, shark.y, shark.d = shark_x, shark_y, shark_d
-
-
-
+        shark.x, shark.y, shark.d = x, y, d
 
 
 
 
 #init
 init_prey = graph[0][0]
-shark = Shark(0, 0, fish_direction[init_prey])
-graph[0][0] = 0
-fish_direction[init_prey] = 0
 
-movement(shark, graph, fish_direction)
+shark = Shark(0, 0, fish_d[init_prey])
+fish_d[init_prey] = 0 # 죽음 처리
 
-backtracking(shark, init_prey, graph, fish_direction)
+graph[0][0] = 0 # 빈 칸으로 처리
+
+
+movement(shark, graph, fish_d)
+
+backtracking(shark, init_prey, graph, fish_d)
 
 print(result)

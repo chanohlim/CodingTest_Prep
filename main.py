@@ -1,99 +1,32 @@
 '''
 
-5 4 4
-0 0 0 0 3
-0 2 0 0 0
-1 0 0 0 4
-0 0 0 0 0
-0 0 0 0 0
-4 4 3 1
-2 3 1 4
-4 1 2 3
-3 4 2 1
-4 3 1 2
-2 4 3 1
-2 1 3 4
-3 4 1 2
-4 1 2 3
-4 3 2 1
-1 4 3 2
-1 3 2 4
-3 2 1 4
-3 4 1 2
-3 2 4 1
-1 4 2 3
-1 4 2 3
+7 6 2 3 15 6 9 8
+3 1 1 8 14 7 10 1
+6 1 13 6 4 3 11 4
+16 1 8 7 5 2 12 2
 
-14
+33
 
-4 2 6
-1 0 0 0
-0 0 0 0
-0 0 0 0
-0 0 0 2
-4 3
-1 2 3 4
-2 3 4 1
-3 4 1 2
-4 1 2 3
-1 2 3 4
-2 3 4 1
-3 4 1 2
-4 1 2 3
+16 7 1 4 4 3 12 8
+14 7 7 6 3 4 10 2
+5 2 15 2 8 3 6 4
+11 8 2 4 13 5 9 4
 
-26
+43
 
-5 4 1
-0 0 0 0 3
-0 2 0 0 0
-1 0 0 0 4
-0 0 0 0 0
-0 0 0 0 0
-4 4 3 1
-2 3 1 4
-4 1 2 3
-3 4 2 1
-4 3 1 2
-2 4 3 1
-2 1 3 4
-3 4 1 2
-4 1 2 3
-4 3 2 1
-1 4 3 2
-1 3 2 4
-3 2 1 4
-3 4 1 2
-3 2 4 1
-1 4 2 3
-1 4 2 3
+12 6 14 5 4 5 6 7
+15 1 11 7 3 7 7 5
+10 3 8 3 16 6 1 1
+5 8 2 7 13 6 9 2
 
--1
+76
 
-5 4 10
-0 0 0 0 3
-0 0 0 0 0
-1 2 0 0 0
-0 0 0 0 4
-0 0 0 0 0
-4 4 3 1
-2 3 1 4
-4 1 2 3
-3 4 2 1
-4 3 1 2
-2 4 3 1
-2 1 3 4
-3 4 1 2
-4 1 2 3
-4 3 2 1
-1 4 3 2
-1 3 2 4
-3 2 1 4
-3 4 1 2
-3 2 4 1
-1 4 2 3
-1 4 2 3
+2 6 10 8 6 7 9 4
+1 7 16 6 4 2 5 8
+3 7 8 6 7 6 14 8
+12 7 15 4 11 3 13 3
 
--1
+39
 
 '''
 
@@ -101,147 +34,135 @@ from sys import stdin
 input = stdin.readline
 
 from utils.print_graph import print_graph
+from copy import deepcopy
 
-N, M, k = map(int, input().split())
+direction_x = [0, -1, -1, 0, 1, 1, 1, 0, -1]
+direction_y = [0, 0, -1, -1, -1, 0, 1, 1, 1]
 
-# 위(1) 아래(2) 왼쪽(3) 오른쪽(4)
-movement_x = [0, -1, 1, 0, 0]
-movement_y = [0, 0, 0, -1, 1]
+fish_d = [0] * 17
 
-sharks = []
-shark_graph = []
-scent_graph = [[ [0,0] for i in range(N) ] for i in range(N)]
-
-
-priority = [[] for i in range(M)] # priority[a-1][b-1] => a 상어가 b 방향으로 갈 때의 우선순위
+result = 0
 
 class Shark:
 
-    def __init__(self, n, x, y, d):
-        self.n = n
+    def __init__(self, x, y, d):
         self.x = x
         self.y = y
         self.d = d
 
-sharks.append(Shark(0, 0, 0, 0)) # dummy shark
 
-for i in range(N):
-    shark_graph.append(list(map(int, input().split())))
+graph = [[] for i in range(4)]
 
-
-init_d = list(map(int, input().split()))
-
-for n in range(1, M+1):
-    d = init_d[n-1]
-    for i in range(N):
-        for j in range(N):
-            if shark_graph[i][j] == n:
-                sharks.append(Shark(n, i, j, d))
-
-for i in range(M):
+for i in range(4):
+    data = list(map(int, input().split()))
     for j in range(4):
-        priority[i].append(list(map(int, input().split())))
+        n = data[2*j] # 물고기의 번호
+        graph[i].append(n)
+        fish_d[n] = data[2*j + 1]
 
 
+def movement(shark, graph, fish_d):
 
-for shark in sharks:
-    n, x, y = shark.n, shark.x, shark.y
+    shark_x, shark_y = shark.x, shark.y
 
-    if n == 0:
-        continue
+    for fish in range(1, 17):
 
-    scent_graph[x][y] = [n, k]
-
-
-def movement(N, sharks, k):
-
-    for shark in sharks:
-
-        n, x, y, d = shark.n, shark.x, shark.y, shark.d
-
-        if n == 0: # 퇴출된 상어는 무시
+        if fish_d[fish] == 0: # 죽은 물고기는 패스
             continue
 
-        possible = False
+        for i in range(4):
+            for j in range(4):
+                if graph[i][j] == fish:
+                    x, y = i, j
+                    break
 
-        for dir in priority[n-1][d-1]:
-            dx, dy = x + movement_x[dir], y + movement_y[dir]
+        d = fish_d[fish]
 
-            if dx < 0 or dx >= N or dy < 0 or dy >= N:
-                continue
+        for i in range(8):
 
-            if scent_graph[dx][dy] != [0, 0]:
+            dx, dy = x + direction_x[d], y + direction_y[d]
+
+            if (dx < 0 or dx >= 4 or dy < 0 or dy >= 4) or (shark_x == dx and shark_y == dy):
+                d = (d % 8) + 1
                 continue
 
             possible = True
-            shark.d = dir
             break
 
         if possible:
-
-            if shark_graph[dx][dy] != 0:
-                shark.n = 0 # 퇴출 처리
-                shark_graph[x][y] = 0
-        
-            else:
-                shark_graph[dx][dy] = n
-                shark_graph[x][y] = 0
-                shark.x, shark.y = dx, dy
-
-        else:
-
-            for dir in priority[n-1][d-1]:
-                dx, dy = x + movement_x[dir], y + movement_y[dir]
-
-                if dx < 0 or dx >= N or dy < 0 or dy >= N:
-                    continue
-
-                if scent_graph[dx][dy][0] == n:
-                    shark_graph[dx][dy] = n
-                    shark_graph[x][y] = 0
-                    shark.x, shark.y , shark.d = dx, dy, dir
-                    break
+            fish_d[fish] = d
+            graph[dx][dy], graph[x][y] = graph[x][y], graph[dx][dy]
 
 
-    for i in range(N):
-        for j in range(N):
-            if scent_graph[i][j][0] != 0:
-                scent_graph[i][j][1] -= 1
-                if scent_graph[i][j][1] == 0:
-                    scent_graph[i][j] = [0, 0]
-                        
-    for shark in sharks:
+def possible_prey(shark, graph):
 
-        n, x, y = shark.n, shark.x, shark.y
+    x, y, d = shark.x, shark.y, shark.d
+    possible = []
 
-        if n == 0:
+    for i in range(1, 4):
+        dx, dy = x + direction_x[d]*i, y + direction_y[d]*i
+
+        if (dx < 0 or dx >= 4 or dy < 0 or dy >= 4) or (graph[dx][dy] == 0):
             continue
 
-        scent_graph[x][y] = [n, k]
+        possible.append((dx, dy))
+
+    return possible
+
+
+def hunt(shark, prey, graph, fish_d): # 상어가 물고기가 있는 좌표로 이동 후 물고기를 먹기
+
+    x, y = shark.x, shark.y
+    dx, dy = prey
+    fish = graph[dx][dy]
+
+    shark.d = fish_d[fish]
+    shark.x, shark.y = dx, dy
+
+    graph[dx][dy] = 0
+    fish_d[fish] = 0 # 죽음 처리
+
+    return fish
+
+
+def backtracking(shark, total, graph, fish_d):
+
+    global result
+
+    possible = possible_prey(shark, graph)
+
+    if not possible:
+        result = max(result, total)
+        return
+
+    for p in possible:
+
+        graph_copy = deepcopy(graph)
+        fish_d_copy = deepcopy(fish_d)
+
+        x, y, d = shark.x, shark.y, shark.d
+
+        prey = hunt(shark, p, graph_copy, fish_d_copy)
+        movement(shark, graph_copy, fish_d_copy)
+
+        backtracking(shark, total + prey, graph_copy, fish_d_copy)
+
+        shark.x, shark.y, shark.d = x, y, d
 
 
 
-time = 0
 
-while True:
+#init
+init_prey = graph[0][0]
 
-    alive = 0
+shark = Shark(0, 0, fish_d[init_prey])
+fish_d[init_prey] = 0 # 죽음 처리
 
-    for shark in sharks:
-        n = shark.n
+graph[0][0] = 0 # 빈 칸으로 처리
 
-        if n != 0:
-            alive += 1
 
-    if alive == 1:
-        break
+movement(shark, graph, fish_d)
 
-    if time == 1000:
-        time = -1
-        break
+backtracking(shark, init_prey, graph, fish_d)
 
-    movement(N, sharks, k)
-
-    time += 1
-
-print(time)
+print(result)
