@@ -12,23 +12,28 @@ def solution(food_times, k):
     if sum(food_times) <= k:
         return -1
     
-    pq = []
-    length = len(food_times)
+    answer = 0
     
-    for i in range(len(food_times)):
-        heapq.heappush(pq, (food_times[i], i+1))
+    pq = []
+    l = len(food_times)
+    
+    prev = 0
+    
+    for i in range(l):
+        heapq.heappush(pq, [food_times[i], i+1])
+    
         
-    previous = 0
-        
-    while (pq[0][0]-previous) * length <= k:
+    while (pq[0][0] - prev) * l <= k:
         
         now = heapq.heappop(pq)[0]
         
-        k -= (now-previous) * length
-        length -= 1
+        k -= l * (now - prev)
+        l -= 1
         
-        previous = now
-
-    pq.sort(key = lambda x: x[1])
-    return pq[k % length][1]
-        
+        prev = now
+            
+    
+    pq.sort(key=lambda x: x[1])
+    answer = pq[k%l][1]
+    
+    return answer
