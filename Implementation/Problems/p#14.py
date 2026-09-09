@@ -17,6 +17,7 @@ dist1 = [1, 2, 3, 4]
 weak2 = [1, 3, 4, 9, 10]
 dist2 = [3, 5, 7]
 
+
 from itertools import permutations
 
 def solution(n, weak, dist):
