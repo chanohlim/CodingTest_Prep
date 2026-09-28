@@ -26,52 +26,68 @@
 
 '''
 
-import heapq as h
-from print_graph import print_graph
+import heapq
+from utils.print_graph import print_graph
+from sys import stdin
+input = stdin.readline
 
 INF = int(1e9)
 
+
+def Dijkstra(N, graph):
+
+    distance = [[INF] * N for i in range(N)]
+    visited = [[False] * N for i in range(N)]
+
+    mx = [-1, 1, 0, 0]
+    my = [0, 0, -1, 1]
+
+    distance[0][0] = graph[0][0]
+
+    pq = []
+    heapq.heappush(pq, (distance[0][0], (0, 0)))
+    visited[0][0] = True
+
+    while pq:
+
+        dist, now = heapq.heappop(pq)
+        x, y = now
+
+        if dist > distance[x][y]:
+            continue
+
+        for k in range(4):
+            dx, dy = x + mx[k], y + my[k]
+
+            if dx < 0 or dx >= N or dy < 0 or dy >= N:
+                continue
+
+            if visited[dx][dy]:
+                continue
+
+            cost = dist + graph[dx][dy]
+            if cost < distance[dx][dy]:
+                heapq.heappush(pq, (cost, (dx, dy)))
+                visited[dx][dy] = True
+                distance[dx][dy] = cost
+
+    return distance[N-1][N-1]
+    
+            
+
+
 T = int(input())
+answer = []
 
-movement = [(0, 1), (0, -1), (1, 0), (-1, 0)]
-
-
-def Dijkstra(N):
-
+for t in range(T):
+    
+    N = int(input())
     graph = []
 
     for i in range(N):
         graph.append(list(map(int, input().split())))
 
-    distance = [[INF] * N for i in range(N)]
-    
-    pq = []
-    h.heappush(pq, (graph[0][0], (0,0))) # cost, 좌표
-    distance[0][0] = graph[0][0]
+    answer.append(Dijkstra(N, graph))
 
-    while pq:
-        dist, now = h.heappop(pq)
-        i, j = now
-
-        if dist > distance[i][j]: # 현재 꺼낸 경로가 이미 더 짧은 최단경로로 갱신이 된 경우 => 굳이 안봐도 됨
-            continue
-
-        for k in range(4):
-            di, dj = i + movement[k][0], j + movement[k][1]
-
-            if di < 0 or di >= N or dj < 0 or dj >= N:
-                continue
-
-            cost = dist + graph[di][dj]
-
-            if cost < distance[di][dj]: # 더 좋은 경로를 발견하면 해당 노드까지의 최단거리를 갱신하고, 새로운 정보를 다시 탐색한다.
-                distance[di][dj] = cost
-                h.heappush(pq, (cost, (di, dj)))
-
-    print_graph(distance)
-    print(distance[N-1][N-1])
-
-for t in range(T):
-
-    N = int(input())
-    Dijkstra(N)
+for a in answer:
+    print(a)

@@ -20,46 +20,49 @@
 3
 
 '''
-
 from sys import stdin
 input = stdin.readline
 
+
 G = int(input())
 P = int(input())
+
+planes = []
+for i in range(P):
+    planes.append(int(input()))
+
 
 root = [i for i in range(G + 1)]
 
 def find_root(x):
 
-    while x != root[x]:
+    while root[x] != x:
         root[x] = root[root[x]]
         x = root[x]
 
     return x
-
+    
 
 def union(a, b):
 
-    if a < b:
-        root[b] = a
+    root_a = find_root(a)
+    root_b = find_root(b)
+
+    if root_a < root_b:
+        root[root_b] = root_a
     else:
-        root[a] = b
+        root[root_a] = root_b
 
-
-planes = []
-cnt = 0
-
-for p in range(P):
-    planes.append(int(input()))
-
+answer = 0
 
 for p in planes:
-    root_p = find_root(p)
 
+    root_p = find_root(p)
     if root_p == 0:
         break
 
     union(root_p, root_p - 1)
-    cnt += 1
+    answer += 1
 
-print(cnt)
+
+print(answer)
