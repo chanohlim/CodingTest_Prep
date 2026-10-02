@@ -96,153 +96,131 @@
 -1
 
 '''
-
+from utils.print_graph import print_graph
 from sys import stdin
 input = stdin.readline
 
 
 N, M, k = map(int, input().split())
 
-# 위(1) 아래(2) 왼쪽(3) 오른쪽(4)
-movement_x = [0, -1, 1, 0, 0]
-movement_y = [0, 0, 0, -1, 1]
-
-sharks = []
-shark_graph = []
-scent_graph = [[ [0,0] for i in range(N) ] for i in range(N)]
-
-
-priority = [[] for i in range(M)] # priority[a-1][b-1] => a 상어가 b 방향으로 갈 때의 우선순위
-
 class Shark:
 
-    def __init__(self, n, x, y, d):
+    def __init__(self, n, x, y, d, alive):
         self.n = n
         self.x = x
         self.y = y
         self.d = d
+        self.alive = alive
 
-sharks.append(Shark(0, 0, 0, 0)) # dummy shark
+mx = [-1, 1, 0, 0]
+my = [0, 0, -1, 1]
 
-def movement(N, sharks, k):
+
+n_shark = M
+
+
+def move(graph, scent_map, sharks, preference, N, M, k):
+    global n_shark
 
     for shark in sharks:
+        
+        n, x, y, d, alive = shark.n, shark.x, shark.y, shark.d, shark.alive
 
-        n, x, y, d = shark.n, shark.x, shark.y, shark.d
-
-        if n == 0: # 퇴출된 상어는 무시
+        if not alive:
             continue
 
         possible = False
+        for p in preference[n-1][d-1]:
 
-        for dir in priority[n-1][d-1]:
-            dx, dy = x + movement_x[dir], y + movement_y[dir]
+            dx, dy = x + mx[p-1], y + my[p-1]
 
             if dx < 0 or dx >= N or dy < 0 or dy >= N:
                 continue
 
-            if scent_graph[dx][dy] != [0, 0]:
+            if scent_map[dx][dy] != [0, 0]:
                 continue
 
             possible = True
-            shark.d = dir
             break
 
-        if possible:
 
-            if shark_graph[dx][dy] != 0:
-                shark.n = 0 # 퇴출 처리
-                shark_graph[x][y] = 0
-        
-            else:
-                shark_graph[dx][dy] = n
-                shark_graph[x][y] = 0
-                shark.x, shark.y = dx, dy
+        if not possible: # 인접한 냄새가 없는 칸이 없음
 
-        else:
+            for p in preference[n-1][d-1]:
 
-            for dir in priority[n-1][d-1]:
-                dx, dy = x + movement_x[dir], y + movement_y[dir]
+                dx, dy = x + mx[p-1], y + my[p-1]
 
                 if dx < 0 or dx >= N or dy < 0 or dy >= N:
                     continue
 
-                if scent_graph[dx][dy][0] == n:
-                    shark_graph[dx][dy] = n
-                    shark_graph[x][y] = 0
-                    shark.x, shark.y , shark.d = dx, dy, dir
+                if scent_map[dx][dy][0] == n:
                     break
+
+        if graph[dx][dy] != 0:
+            shark.alive = False
+            n_shark -= 1
+            graph[x][y] = 0
+
+        else:
+            shark.x, shark.y, shark.d = dx, dy, p
+            graph[dx][dy] = n
+            graph[x][y] = 0
 
 
     for i in range(N):
         for j in range(N):
-            if scent_graph[i][j][0] != 0:
-                scent_graph[i][j][1] -= 1
-                if scent_graph[i][j][1] == 0:
-                    scent_graph[i][j] = [0, 0]
-                        
+            if scent_map[i][j][0] != 0:
+                scent_map[i][j][1] -= 1
+                if scent_map[i][j][1] == 0:
+                    scent_map[i][j] = [0, 0]
+
     for shark in sharks:
-
-        n, x, y = shark.n, shark.x, shark.y
-
-        if n == 0:
+        if shark.alive == False:
             continue
+        
+        n, x, y = shark.n, shark.x, shark.y
+        scent_map[x][y] = [n, k]
 
-        scent_graph[x][y] = [n, k]
+            
 
-
-
-#init
+graph = []
 for i in range(N):
-    shark_graph.append(list(map(int, input().split())))
+    graph.append(list(map(int, input().split())))
 
+sharks = [ Shark(i+1, 0, 0, 0, False) for i in range(M) ]
+scent_map = [ [[0,0] for i in range(N)] for j in range(N) ]
 
 init_d = list(map(int, input().split()))
 
-for n in range(1, M+1):
-    d = init_d[n-1]
-    for i in range(N):
-        for j in range(N):
-            if shark_graph[i][j] == n:
-                sharks.append(Shark(n, i, j, d))
+for i in range(M):
+    sharks[i].d = init_d[i]
+    sharks[i].alive = True
 
+for i in range(N):
+    for j in range(N):
+        if graph[i][j] != 0:
+            sharks[graph[i][j] - 1].x, sharks[graph[i][j] - 1].y = i, j
+            scent_map[i][j] = [graph[i][j], k]
+
+print_graph(scent_map)
+
+
+preference = [ [] for i in range(M) ]
 for i in range(M):
     for j in range(4):
-        priority[i].append(list(map(int, input().split())))
-
-
-
-for shark in sharks:
-    n, x, y = shark.n, shark.x, shark.y
-
-    if n == 0:
-        continue
-
-    scent_graph[x][y] = [n, k]
-
+        preference[i].append(list(map(int, input().split())))
 
 
 time = 0
 
-while True:
+while n_shark > 1:
 
-    alive = 0
+    move(graph, scent_map, sharks, preference, N, M, k)
+    print_graph(scent_map)
+    time += 1
 
-    for shark in sharks:
-        n = shark.n
-
-        if n != 0:
-            alive += 1
-
-    if alive == 1:
-        break
-
-    if time == 1000:
+    if time > 1000:
         time = -1
         break
-
-    movement(N, sharks, k)
-
-    time += 1
 
 print(time)

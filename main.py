@@ -1,181 +1,226 @@
 '''
 
-7 6 2 3 15 6 9 8
-3 1 1 8 14 7 10 1
-6 1 13 6 4 3 11 4
-16 1 8 7 5 2 12 2
+5 4 4
+0 0 0 0 3
+0 2 0 0 0
+1 0 0 0 4
+0 0 0 0 0
+0 0 0 0 0
+4 4 3 1
+2 3 1 4
+4 1 2 3
+3 4 2 1
+4 3 1 2
+2 4 3 1
+2 1 3 4
+3 4 1 2
+4 1 2 3
+4 3 2 1
+1 4 3 2
+1 3 2 4
+3 2 1 4
+3 4 1 2
+3 2 4 1
+1 4 2 3
+1 4 2 3
 
-33
+14
 
-16 7 1 4 4 3 12 8
-14 7 7 6 3 4 10 2
-5 2 15 2 8 3 6 4
-11 8 2 4 13 5 9 4
+4 2 6
+1 0 0 0
+0 0 0 0
+0 0 0 0
+0 0 0 2
+4 3
+1 2 3 4
+2 3 4 1
+3 4 1 2
+4 1 2 3
+1 2 3 4
+2 3 4 1
+3 4 1 2
+4 1 2 3
 
-43
+26
 
-12 6 14 5 4 5 6 7
-15 1 11 7 3 7 7 5
-10 3 8 3 16 6 1 1
-5 8 2 7 13 6 9 2
+5 4 1
+0 0 0 0 3
+0 2 0 0 0
+1 0 0 0 4
+0 0 0 0 0
+0 0 0 0 0
+4 4 3 1
+2 3 1 4
+4 1 2 3
+3 4 2 1
+4 3 1 2
+2 4 3 1
+2 1 3 4
+3 4 1 2
+4 1 2 3
+4 3 2 1
+1 4 3 2
+1 3 2 4
+3 2 1 4
+3 4 1 2
+3 2 4 1
+1 4 2 3
+1 4 2 3
 
-76
+-1
 
-2 6 10 8 6 7 9 4
-1 7 16 6 4 2 5 8
-3 7 8 6 7 6 14 8
-12 7 15 4 11 3 13 3
+5 4 10
+0 0 0 0 3
+0 0 0 0 0
+1 2 0 0 0
+0 0 0 0 4
+0 0 0 0 0
+4 4 3 1
+2 3 1 4
+4 1 2 3
+3 4 2 1
+4 3 1 2
+2 4 3 1
+2 1 3 4
+3 4 1 2
+4 1 2 3
+4 3 2 1
+1 4 3 2
+1 3 2 4
+3 2 1 4
+3 4 1 2
+3 2 4 1
+1 4 2 3
+1 4 2 3
 
-39
+-1
 
 '''
-
+from utils.print_graph import print_graph
 from sys import stdin
 input = stdin.readline
 
-from utils.print_graph import print_graph
 
+N, M, k = map(int, input().split())
 
 class Shark:
-    
-    def __init__(self, x, y, d, food):
-        self.x = x
-        self.y = y
-        self.d = d
-        self.food = food
 
-
-class Fish:
-
-    def __init__(self, x, y, d, alive):
+    def __init__(self, n, x, y, d, alive):
+        self.n = n
         self.x = x
         self.y = y
         self.d = d
         self.alive = alive
 
+mx = [-1, 1, 0, 0]
+my = [0, 0, -1, 1]
 
-answer = 0
 
-mx = [0, -1, -1, 0, 1, 1, 1, 0, -1]
-my = [0, 0, -1, -1, -1, 0, 1, 1, 1]
+n_shark = M
 
-def move(fish, shark, graph, N):
 
-    for n in range(1, (N * N) + 1):
+def move(graph, scent_map, sharks, preference, N, M, k):
+    global n_shark
 
-        x, y, d, alive = fish[n].x, fish[n].y, fish[n].d, fish[n].alive
+    for shark in sharks:
+        
+        n, x, y, d, alive = shark.n, shark.x, shark.y, shark.d, shark.alive
 
         if not alive:
             continue
 
-        switch = False
-        for k in range(8):
-            dx, dy = x + mx[d], y + my[d]
+        possible = False
+        for p in preference[n-1][d-1]:
+
+            dx, dy = x + mx[p-1], y + my[p-1]
 
             if dx < 0 or dx >= N or dy < 0 or dy >= N:
-                d = (d % 8) + 1
                 continue
 
-            if dx == shark.x and dy == shark.y:
-                d = (d % 8) + 1
+            if scent_map[dx][dy] != [0, 0]:
                 continue
 
-            switch = True
+            possible = True
             break
 
-        if switch:
+
+        if not possible: # 인접한 냄새가 없는 칸이 없음
+
+            for p in preference[n-1][d-1]:
+
+                dx, dy = x + mx[p-1], y + my[p-1]
+
+                if dx < 0 or dx >= N or dy < 0 or dy >= N:
+                    continue
+
+                if scent_map[dx][dy][0] == n:
+                    break
+
+        if graph[dx][dy] != 0:
+            shark.alive = False
+            n_shark -= 1
+            graph[x][y] = 0
+
+        else:
+            shark.x, shark.y, shark.d = dx, dy, p
+            graph[dx][dy] = n
+            graph[x][y] = 0
+
+
+    for i in range(N):
+        for j in range(N):
+            if scent_map[i][j][0] != 0:
+                scent_map[i][j][1] -= 1
+                if scent_map[i][j][1] == 0:
+                    scent_map[i][j] = [0, 0]
+
+    for shark in sharks:
+        if shark.alive == False:
+            continue
+        
+        n, x, y = shark.n, shark.x, shark.y
+        scent_map[x][y] = [n, k]
+
             
-            fish[n].d = d
-            target = graph[dx][dy]
-
-            if target != 0:
-                fish[target].x, fish[target].y = x, y
-
-            fish[n].x, fish[n].y = dx, dy
-            graph[dx][dy], graph[x][y] = graph[x][y], graph[dx][dy]
-
-
-
-def get_next_prey(shark, graph, N):
-
-    next_prey = []
-
-    x, y, d = shark.x, shark.y, shark.d
-
-    for k in range(N):
-        x += mx[d]
-        y += my[d]
-
-        if x < 0 or x >= N or y < 0 or y >= N:
-            break
-
-        if graph[x][y] != 0:
-            next_prey.append((x, y))
-
-    return next_prey
-
-
-def backtracking(next_prey, shark, fish, graph):
-    global answer
-
-
-    if not next_prey:
-        answer = max(answer, shark.food)
-        return
-
-    for prey in next_prey:
-        dx, dy = prey
-        n = graph[dx][dy]
-
-        x, y, d = shark.x, shark.y, shark.d
-
-        shark.x, shark.y, shark.d = dx, dy, fish[n].d
-        fish[n].alive = False
-        shark.food += n
-        graph[dx][dy] = 0
-
-        graph_copy = [row[:] for row in graph]
-        fish_copy = [Fish(fish[i].x, fish[i].y, fish[i].d, fish[i].alive) for i in range((N*N) + 1)]
-
-        move(fish_copy, shark, graph_copy, N)
-        backtracking(get_next_prey(shark, graph_copy, N), shark, fish_copy, graph_copy)
-
-        shark.x, shark.y, shark.d = x, y, d
-        fish[n].alive = True
-        shark.food -= n
-        graph[dx][dy] = n
-
-
-N = 4
-
-fish = [Fish(0, 0, 0, False) for i in range( (N * N) + 1)]
 
 graph = []
-
-# fish initialize
 for i in range(N):
+    graph.append(list(map(int, input().split())))
 
-    data = list(map(int, input().split()))
-    graph.append(data[::2])
-    for j in range(0, 2*N, 2):
-        fish[data[j]].d = data[j + 1]
-        fish[data[j]].alive = True
+sharks = [ Shark(i+1, 0, 0, 0, False) for i in range(M) ]
+scent_map = [ [[0,0] for i in range(N)] for j in range(N) ]
+
+init_d = list(map(int, input().split()))
+
+for i in range(M):
+    sharks[i].d = init_d[i]
+    sharks[i].alive = True
 
 for i in range(N):
     for j in range(N):
-        now = graph[i][j]
-        fish[now].x, fish[now].y = i, j
+        if graph[i][j] != 0:
+            sharks[graph[i][j] - 1].x, sharks[graph[i][j] - 1].y = i, j
+            scent_map[i][j] = [graph[i][j], k]
+
+print_graph(scent_map)
 
 
-init_prey = graph[0][0]
+preference = [ [] for i in range(M) ]
+for i in range(M):
+    for j in range(4):
+        preference[i].append(list(map(int, input().split())))
 
-shark = Shark(0, 0, fish[init_prey].d, init_prey)
-fish[init_prey].alive = False
 
-graph[0][0] = 0
+time = 0
 
-move(fish, shark, graph, N)
+while n_shark > 1:
 
-backtracking(get_next_prey(shark, graph, N), shark, fish, graph)
+    move(graph, scent_map, sharks, preference, N, M, k)
+    print_graph(scent_map)
+    time += 1
 
-print(answer)
+    if time > 1000:
+        time = -1
+        break
+
+print(time)
