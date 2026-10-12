@@ -1,93 +1,60 @@
 from collections import deque
-from time import sleep
+from print_graph import print_graph
 
 def solution(rectangle, characterX, characterY, itemX, itemY):
-    
-    max_n = 0
-    
-    mx = [-1, -1, 0, 1, 1, 1, 0, -1]
-    my = [0, -1, -1, -1, 0, 1, 1, 1]
-    
-    for rect in rectangle:
-        max_n = max(max_n, max(rect))
-        
-    graph = [[1] * (3*max_n + 3) for i in range(3*max_n + 3) ]
-    
-    for rect in rectangle:
-        x1, y1, x2, y2 = rect
-        
-        x1 *= 3
-        y1 *= 3
-        x2 *= 3
-        y2 *= 3
-        
-        
-        for i in range(y1-1, y2):
-            for j in range(x1-1, x2):
-                graph[i][j] = 0
-                
-                
-    new_graph = [row[:] for row in graph]
-    
-    for x in range(3, 3*max_n + 3):
-        for y in range(3, 3*max_n + 3):
-            
-            if graph[x][y] == 0:
 
-                border = False
+    max_n = 30
+    graph = [[8] * max_n for i in range(max_n)]
 
-                for k in range(8):
-                    dx, dy = x + mx[k], y + my[k]
-                    
-                    if graph[dx][dy] == 1:
-                        border = True
-                        break
-                
-                if border:
-                    continue
-                    
-                new_graph[x][y] = 1
-    
-    visited = [[False] * (3*max_n + 3) for i in range(3*max_n + 3)]
-    
+    for rect in rectangle:
+        x1, y1, x2, y2 = map(lambda x: 2*x, rect)
+
+        for i in range(x1, x2 + 1):
+            for j in range(y1, y2 + 1):
+                if x1 < i < x2 and y1 < j < y2:
+                    graph[i][j] = 0
+                else:
+                    if graph[i][j] != 0:
+                        graph[i][j] = 1
+
+    print_graph(graph)
+
     mx = [-1, 1, 0, 0]
     my = [0, 0, -1, 1]
-    
-                
-    for i in new_graph:
-        for j in i:
-            print(j, end = ' ')
-        print()
-            
+
+
+    charX, charY, iX, iY = characterX*2, characterY*2, itemX*2, itemY*2
+
     q = deque()
-    q.append((0, (3*characterX, 3*characterY)))
-    visited[characterY][characterX] = True
-    
+    q.append((0, (charX,charY)))
+
     while q:
-        
+
         dist, now = q.popleft()
         x, y = now
 
-        print(dist, now)
+        if x == iX and y == iY:
+            return dist // 2
 
-        if 3*itemX == x and 3*itemY == y:
-            return dist // 3
-        
         for k in range(4):
             dx, dy = x + mx[k], y + my[k]
-            if new_graph[dy][dx] == 1 or visited[dy][dx]:
+
+            if graph[dx][dy] != 1:
                 continue
-                
+
             q.append((dist + 1, (dx, dy)))
-            visited[dy][dx] = True
-            
-    
-    
+            graph[dx][dy] = 0
+
+
+
         
-rectangle = [[1,1,7,4],[3,2,5,5],[4,3,6,9],[2,6,8,8]]
+rectangle1 = [[1,1,7,4],[3,2,5,5],[4,3,6,9],[2,6,8,8]]
+rectangle2 = [[2,2,5,5],[1,3,6,4],[3,1,4,6]]
+rectangle3 = [[2,1,7,5],[6,4,10,10]]
+rectangle4 = [[1,1,8,4],[2,2,4,9],[3,6,9,8],[6,3,7,7]]
 charX = 1
 charY = 3
 itemX = 7
 itemY = 8
 
-print(solution(rectangle, charX, charY, itemX, itemY))
+print(solution(rectangle4, charX, charY, itemX, itemY))
