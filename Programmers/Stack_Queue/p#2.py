@@ -1,34 +1,21 @@
 from collections import deque
 
-def solution(progresses, speeds):
+def solution(s):
     
-    answer = []
+    q = deque(s)
+    cnt = 0
     
-    time = deque()
-    l = len(progresses)
-    
-    for i in range(l):
-        
-        data = (100 - progresses[i]) // speeds[i]
-        if (100 - progresses[i]) % speeds[i] != 0:
-            data += 1
-            
-        time.append(data)
-    
-    cnt = 1
-    
-    passed = time.popleft()
-    
-    while time:
-        
-        if time[0] <= passed:
+    while q:
+        now = q.popleft()
+        if now == '(':
             cnt += 1
-            time.popleft()
         else:
-            answer.append(cnt)
-            passed = time.popleft()
-            cnt = 1
+            cnt -= 1
             
-    answer.append(cnt)
-    
-    return answer
+        if cnt < 0:
+            return False
+        
+    if cnt != 0:
+        return False
+
+    return True
