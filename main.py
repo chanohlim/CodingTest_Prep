@@ -1,17 +1,27 @@
-from collections import deque
+def polynomial_hash(str):
 
-N = 1000
-K = 500
+    p = 31
+    m = 1_000_000_007
+    hash_value = 0
+    for char in str:
+        hash_value = (hash_value * p + ord(char)) % m
+    return hash_value
 
-q = deque([i for i in range(1, N+1)])
-print(q)
+def solution(string_list, query_list):
+    hash_list = [polynomial_hash(str) for str in string_list]
 
-while len(q) > 1:
-    for i in range((K - 1) % len(q)):
-        q.append(q.popleft())
+    result = []
+    for query in query_list:
+        query_hash = polynomial_hash(query)
+        if query_hash in hash_list:
+            result.append(True)
+        else:
+            result.append(False)
 
-    q.popleft()
+    return result
 
-    print(q)
 
-print(q[0])
+string_list = ['apple', 'banana', 'cherry']
+query_list = ['banana', 'kiwi', 'melon', 'apple']
+
+print(solution(string_list, query_list))
